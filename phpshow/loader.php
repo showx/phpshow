@@ -6,7 +6,8 @@ define("PS_HELPER_PATH",dirname(__FILE__)."/helper/");
 define("PS_LIB_PATH",dirname(__FILE__)."/lib/");
 define("PS_CORE","1111");
 
-/**
+require_once PS_HELPER_PATH.'/function.php';
+    /**
  * phpshow核心加载类
  * Author:show
  */
@@ -55,7 +56,7 @@ Class show{
         include_once PS_PATH.'/response.php';
         include_once PS_PATH.'/debug.php';
         request::init();
-        $this->route();
+        $this->miniroute();
         //发生异常的记录
         set_exception_handler(array('\phpshow\debug','handler_debug_exception'));
         //发生错误的记录
@@ -120,8 +121,10 @@ Class show{
     /**
      * phpshow路由处理
      * 规则只有一种
+     * /ct/ac/
+     * /module/ct/ac
      */
-    public function route()
+    public function miniroute()
     {
         $this->config();
         //也可以获取路由规则的
@@ -157,7 +160,6 @@ Class show{
         echo "使用内存:".$this->convert($memory - $this->memory);
 
     }
-
 }
 $show = new show();
 $show->hello();
