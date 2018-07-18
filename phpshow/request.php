@@ -3,6 +3,7 @@
  * request类
  * Author:shengsheng
  */
+namespace phpshow;
 class request
 {
     //用户的cookie

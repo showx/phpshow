@@ -3,6 +3,7 @@
  * 输出接口
  * Author:shengsheng
  */
+namespace phpshow;
 class response
 {
     /**

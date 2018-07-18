@@ -1,4 +1,5 @@
 <?php
+namespace phpshow;
 define("PS_PATH",dirname(__FILE__));
 define("PS_CONFIG_PATH",dirname(__FILE__)."/config/");
 define("PS_HELPER_PATH",dirname(__FILE__)."/helper/");
@@ -33,8 +34,8 @@ Class show{
     //框架配置文件
     public $config = array();
     public $result = array();
-    public $ct;
-    public $ac;
+    public $ct = 'index';
+    public $ac = 'index';
     public function __construct()
     {
         $this->starttime = microtime();
@@ -54,12 +55,11 @@ Class show{
         include_once PS_PATH.'/response.php';
         include_once PS_PATH.'/debug.php';
         request::init();
-        $this->ct = request::item("ct");
-        $this->ac = request::item("ac");
+        $this->route();
         //发生异常的记录
-        set_exception_handler(array('debug','handler_debug_exception'));
+        set_exception_handler(array('\phpshow\debug','handler_debug_exception'));
         //发生错误的记录
-//        set_error_handler('handler_debug_error', E_ALL);
+        set_error_handler(array('\phpshow\debug','handler_debug_error'), E_ALL);
         //页面结束调用
         register_shutdown_function(array($this, 'page_close'));
     }
@@ -93,7 +93,10 @@ Class show{
      */
     public function config()
     {
-
+        //默认加载 phpshow config -> app config;
+        $this->config['db'] = include PS_CONFIG_PATH.'/database.php';
+        $this->config['site'] = include PS_CONFIG_PATH.'/site.php';
+//        $this->config['route_rule'] = include PS_CONFIG_PATH.'/route_rule.php';
     }
     /**
      * 临时读取
@@ -120,18 +123,33 @@ Class show{
      */
     public function route()
     {
+        $this->config();
+        //也可以获取路由规则的
         //读取获取到的参数,ct,ac只能根据url来
         $url = $_SERVER['REQUEST_URI'];
+        $url = parse_url($url);
+        $path = $url['path'];
+        $query = $url['query'] ?? '';
+        $path = explode("/",$path);
+        $this->ct = request::item("ct") ?? $this->ct;
+        $this->ac = request::item("ac") ?? $this->ac;
+        $this->ct = $path['1'] ?? $this->ct;
+        $this->ac = $path['2'] ?? $this->ac;
+        $this->ct = preg_replace('/([^0-9a-z_])+/is','',$this->ct);
+        $this->ac = preg_replace('/([^0-9a-z_])+/is','',$this->ac);
     }
+
+    /**
+     * 输出美好的世界
+     */
     public function hello()
     {
         echo 'hello world';
     }
-    public function test()
-    {
-        echo "test";
-    }
-    //程序结束时的记录
+
+    /**
+     * 程序结束时的调用
+     */
     public function page_close()
     {
         $memory = memory_get_usage();
@@ -142,10 +160,4 @@ Class show{
 
 }
 $show = new show();
-
-$show->test();
-
-
-
-
-
+$show->hello();

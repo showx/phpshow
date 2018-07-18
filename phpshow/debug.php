@@ -3,6 +3,7 @@
  * 捕获错误信息
  * Author:show
  */
+namespace phpshow;
 Class debug
 {
     //错误类型数组
