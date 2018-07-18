@@ -1,0 +1,14 @@
+{
+    "name": "showx/phpshow",
+    "description": "phpshow framework",
+    "authors": [
+        {
+            "name": "show",
+            "email": "9448923@qq.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "showx/mongox": "^1.0"
+    }
+}

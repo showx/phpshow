@@ -1,5 +1,4 @@
 <?php
-if( !defined('PHPSHOW') ) exit('Request Error!');
 /**
  * request类
  * Author:shengsheng
