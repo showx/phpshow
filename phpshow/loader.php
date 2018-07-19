@@ -49,8 +49,10 @@ Class show{
         if( PHP_SAPI == 'cli' )
         {
             define('run_mode','2');
+            define('lr','\n');
         }else{
             define('run_mode','1');
+            define('lr','<br/>');
         }
         spl_autoload_register(array($this, 'autoload'));
         //增加上composer加载
@@ -101,7 +103,8 @@ Class show{
         );
         $file = str_replace('\\', DIRECTORY_SEPARATOR, $classname).'.php';
         $file = PS_PATH.str_replace('phpshow', '', $file);
-        echo $classname."----".$file;
+        //这里加载的文件输出到debug框
+//        echo $classname."----".$file;
         if (file_exists($file)) {
             require $file;
             return true;
@@ -177,7 +180,7 @@ Class show{
     {
         $memory = memory_get_usage();
         \phpshow\lib\debug::show_debug_error();
-        echo "使用内存:".$this->convert($memory - $this->memory);
+        echo lr."使用内存:".$this->convert($memory - $this->memory);
 
     }
 }
