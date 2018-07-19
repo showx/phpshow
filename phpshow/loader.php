@@ -1,5 +1,11 @@
 <?php
+/**
+ * phpshow核心加载
+ * Author:show
+ */
 namespace phpshow;
+//错误等级定义
+error_reporting( E_ALL );
 define("PS_PATH",dirname(__FILE__));
 define("PS_CONFIG_PATH",dirname(__FILE__)."/config/");
 define("PS_HELPER_PATH",dirname(__FILE__)."/helper/");
@@ -7,22 +13,20 @@ define("PS_LIB_PATH",dirname(__FILE__)."/lib/");
 define("PS_CORE","1111");
 
 require_once PS_HELPER_PATH.'/function.php';
-    /**
- * phpshow核心加载类
- * Author:show
- */
-
-// 严格开发模式
-error_reporting( E_ALL );
-//开启register_globals会有诸多不安全可能性，因此强制要求关闭register_globals
 if ( ini_get('register_globals') )
 {
-    exit('php.ini register_globals must is Off! ');
+    if (isset($_REQUEST['GLOBALS']) || isset($_FILES['GLOBALS'])) {
+        die('fuck GLOBALS');
+    }
+    $noUnset= array('GLOBALS','_GET','_POST','_COOKIE','_REQUEST','_SERVER','_ENV','_FILES');
+    $input=array_merge($_GET,$_POST,$_COOKIE,$_SERVER,$_ENV,$_FILES,isset($_SESSION) &&is_array($_SESSION) ?$_SESSION: array());
+    foreach ($input as $k=>$v) {
+        if (!in_array($k,$noUnset) && isset($GLOBALS[$k])) {
+
+            unset($GLOBALS[$k]);
+        }
+    }
 }
-/**
- * Class show
- * 框架的核心加载
- */
 Class show{
     //框架开始时间
     private $starttime;
@@ -52,15 +56,15 @@ Class show{
         //增加上composer加载
         require PS_PATH.'/composer/vendor/autoload.php';
         //默认必定的加载的类
-        include_once PS_PATH.'/request.php';
+//        include_once PS_PATH.'/request.php';
         include_once PS_PATH.'/response.php';
-        include_once PS_PATH.'/debug.php';
+        include_once PS_PATH.'/lib/debug.php';
         request::init();
         $this->miniroute();
         //发生异常的记录
-        set_exception_handler(array('\phpshow\debug','handler_debug_exception'));
+        set_exception_handler(array('\phpshow\lib\debug','handler_debug_exception'));
         //发生错误的记录
-        set_error_handler(array('\phpshow\debug','handler_debug_error'), E_ALL);
+        set_error_handler(array('\phpshow\lib\debug','handler_debug_error'), E_ALL);
         //页面结束调用
         register_shutdown_function(array($this, 'page_close'));
     }
@@ -69,19 +73,35 @@ Class show{
         $unit=array('b','kb','mb','gb','tb','pb');
         return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
     }
+
+    /**
+     * 可以由用户自定义加载的配置
+     * @param $auto_arr
+     */
+    public function setAuloader($auto_arr)
+    {
+        if($auto_arr)
+        {
+            $this->autolader = $auto_arr;
+        }
+    }
     /**
      * phpshow自动加载
      * 遵守一定的规则加载
      */
     public function autoload($classname)
     {
-        $classname = preg_replace("/[^0-9a-z_]/i", '', $classname);
+        $classname = preg_replace("/[^0-9a-z_\/\\\\]/i", '', $classname);
         if( class_exists ( $classname ) ) {
             //已经加载过返回true
             return true;
         }
-        $classfile = $classname.'.php';
+        $autoloader = array(
+            "phpshow" => "",
+        );
         $file = str_replace('\\', DIRECTORY_SEPARATOR, $classname).'.php';
+        $file = PS_PATH.str_replace('phpshow', '', $file);
+        echo $classname."----".$file;
         if (file_exists($file)) {
             require $file;
             return true;
@@ -156,7 +176,7 @@ Class show{
     public function page_close()
     {
         $memory = memory_get_usage();
-        debug::show_debug_error();
+        \phpshow\lib\debug::show_debug_error();
         echo "使用内存:".$this->convert($memory - $this->memory);
 
     }
