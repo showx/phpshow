@@ -1,6 +1,6 @@
 <?php
 /**
- * 输出接口
+ * response类
  * Author:shengsheng
  */
 namespace phpshow;
@@ -9,7 +9,7 @@ class response
     /**
      * 输出头部信息
      */
-    public function getHeader()
+    public static function getHeader()
     {
         header('Content-Type: text/html; charset=utf-8');
     }
@@ -17,17 +17,37 @@ class response
     /**
      * 输出json
      */
-    public function json()
+    public static function json($code='0',$msg,$data)
     {
-
+        $result = array(
+            'code' => $code,
+            'message' => $msg,
+            'data' => $data,
+        );
+        echo json_encode($result);
     }
 
     /**
      * 输出xml
      */
-    public function xml()
+    public static function xml($data)
     {
+        //构造xml数据格式
+        $xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+        $xml .= "<data>\n";
+        foreach ($data as $item_arr) {
+            $item = "<item>\n";
+            foreach($item_arr as $ikey=>$ival)
+            {
+                //循环构造xml单项
+                $item .= "<{$ikey}>" . $ival . "</{$ikey}>\n";
+            }
+            $item .= "</item>\n";
+            $xml .=$item;
+        }
+        $xml .= "</data>";
 
+        echo $xml;
     }
 
     /**
@@ -37,7 +57,7 @@ class response
      * @return string
      * @throws Exception
      */
-    public function clicolor($text, $status)
+    public static function clicolor($text, $status)
     {
         $out = "";
         switch($status) {
@@ -63,7 +83,7 @@ class response
     /**
      * json to array
      */
-    public function jta($data)
+    public static function jta($data)
     {
         $data = json_decode($data,true);
         echo "====================\n";
@@ -79,7 +99,7 @@ class response
      * json to config
      * @param $a
      */
-    public function jtoc($data)
+    public static function jtoc($data)
     {
         foreach($data as $key=>$val)
         {
@@ -89,7 +109,7 @@ class response
     /**
      * 数组配置文件式
      */
-    public function configArr($arr,$e='')
+    public static function configArr($arr,$e='')
     {
         if(is_array($arr))
         {
@@ -105,7 +125,7 @@ class response
     /**
      * 一行输出数组
      */
-    public function lineArr($arr)
+    public static function lineArr($arr)
     {
         if(is_array($arr))
         {
@@ -124,7 +144,7 @@ class response
     /**
      * json to array
      */
-    public function JsonToArr($arr,$i=1)
+    public static function JsonToArr($arr,$i=1)
     {
         $str = str_repeat(" ",$i);
         $str2 = str_repeat(" ",$i+1);

@@ -12,8 +12,11 @@ namespace phpshow;
 
 class control
 {
+    //是否ajax请求
+    public $is_ajax = false;
     public function __construct()
     {
+        $this->is_ajax = $this->is_ajax();
         self::_Acl();
     }
 
@@ -23,6 +26,16 @@ class control
     public function _Acl()
     {
 
+    }
+
+    /**
+     * 判断是否ajax请求
+     * @return bool
+     */
+    public function is_ajax()
+    {
+        if(PG_ISAJAX) return true;
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtoupper($_SERVER['HTTP_X_REQUESTED_WITH'])=='XMLHTTPREQUEST';
     }
 
     /**

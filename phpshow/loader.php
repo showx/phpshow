@@ -10,6 +10,7 @@ use \helper\util as util;
 //错误等级定义
 error_reporting( E_ALL );
 defined("PS_DEBUG") or define("PS_DEUBG","1");
+defined("PG_ISAJAX") or define("PG_ISAJAX",false);
 define("PS_PATH",dirname(__FILE__));
 define("PS_CONFIG_PATH",PS_PATH."/config/");
 define("PS_HELPER_PATH",PS_PATH."/helper/");
@@ -33,7 +34,6 @@ if ( ini_get('register_globals') )
     $input=array_merge($_GET,$_POST,$_COOKIE,$_SERVER,$_ENV,$_FILES,isset($_SESSION) &&is_array($_SESSION) ?$_SESSION: array());
     foreach ($input as $k=>$v) {
         if (!in_array($k,$noUnset) && isset($GLOBALS[$k])) {
-
             unset($GLOBALS[$k]);
         }
     }
@@ -41,20 +41,16 @@ if ( ini_get('register_globals') )
 Class show{
     //框架开始时间
     private $starttime;
-    private $endtime;
     private $date_timestamp;
     //框架使用内存
     public $memory = 0;
-    //是否ajax请求
-    public $is_ajax = false;
-    //框架错误代码
-    public $errno = 0;
     //框架配置文件
     public $config = array();
-    public $result = array();
+
     public $ct = 'index';
     public $ac = 'index';
-    public $bindings;
+    public $bindings = array();
+    private $loader_file = array();
     public function __construct()
     {
         $this->begin();
@@ -80,16 +76,6 @@ Class show{
         $this->starttime = microtime(true);
         $this->date_timestamp = time();
         $this->memory = memory_get_usage();
-        $this->is_ajax = $this->is_ajax();
-    }
-
-    /**
-     * 判断是否ajax请求
-     * @return bool
-     */
-    public function is_ajax()
-    {
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtoupper($_SERVER['HTTP_X_REQUESTED_WITH'])=='XMLHTTPREQUEST';
     }
 
     /**
@@ -120,7 +106,7 @@ Class show{
         $file = str_replace('\\', DIRECTORY_SEPARATOR, $classname).'.php';
         $file = PS_PATH.'/'.str_replace('phpshow', '', $file);
         //这里加载的文件输出到debug框
-//        echo lr.$classname."----".$file.lr;
+        $this->loader_file[$classname] = $file;
         if (file_exists($file)) {
             require $file;
             return true;
@@ -130,33 +116,15 @@ Class show{
 
     /**
      * 配置文件的读取
+     * 默认加载 phpshow config -> app config
      */
     public function config()
     {
-        //默认加载 phpshow config -> app config;
         $this->config['db'] = include PS_CONFIG_PATH.'/database.php';
         $this->config['site'] = include PS_CONFIG_PATH.'/site.php';
-//        $this->config['route_rule'] = include PS_CONFIG_PATH.'/route_rule.php';
-    }
-    /**
-     * 临时读取
-     * @param $key
-     * @return mixed
-     */
-    public function get($key)
-    {
-        return $this->result[$key];
+        $this->config['route_rule'] = include PS_CONFIG_PATH.'/route_rule.php';
     }
 
-    /**
-     * 临时存放的变量
-     * @param $key
-     * @param $value
-     */
-    public function set($key,$value)
-    {
-        $this->result[$key] = $value;
-    }
     /**
      * phpshow路由处理
      * 规则只有一种
@@ -221,8 +189,37 @@ Class show{
         return call_user_func_array($this->bindings[$abstract],$parameters);
     }
 }
+//App加载类
+Class App{
+    public $result = array();
+    /**
+     * 临时读取
+     * @param $key
+     * @return mixed
+     */
+    public static function get($key)
+    {
+        return self::$result[$key];
+    }
+    /**
+     * 临时存放的变量
+     * @param $key
+     * @param $value
+     */
+    public static function set($key,$value)
+    {
+        self::$result[$key] = $value;
+    }
 
+    /**
+     * 设置数据
+     * @param $data
+     */
+    public static function setHandler($data)
+    {
 
+    }
+}
 
 $show = new show();
 //根据需要，调用就行
