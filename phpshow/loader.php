@@ -7,9 +7,9 @@ namespace phpshow;
 use \helper\util as util;
 
 
-
 //错误等级定义
 error_reporting( E_ALL );
+defined("PS_DEBUG") or define("PS_DEUBG","1");
 define("PS_PATH",dirname(__FILE__));
 define("PS_CONFIG_PATH",PS_PATH."/config/");
 define("PS_HELPER_PATH",PS_PATH."/helper/");
@@ -54,11 +54,10 @@ Class show{
     public $result = array();
     public $ct = 'index';
     public $ac = 'index';
+    public $bindings;
     public function __construct()
     {
-        $this->starttime = microtime(true);
-        $this->date_timestamp = time();
-        $this->memory = memory_get_usage();
+        $this->begin();
         spl_autoload_register(array($this, 'autoload'));
         //增加上composer加载
         require PS_PATH.'/composer/vendor/autoload.php';
@@ -70,15 +69,25 @@ Class show{
         //发生错误的记录
         set_error_handler(array('\phpshow\lib\debug','handler_debug_error'), E_ALL);
         //页面结束调用
-        register_shutdown_function(array($this, 'page_close'));
+        register_shutdown_function(array($this, 'end'));
     }
 
+    /**
+     * 程序初此化
+     */
+    public function begin()
+    {
+        $this->starttime = microtime(true);
+        $this->date_timestamp = time();
+        $this->memory = memory_get_usage();
+        $this->is_ajax = $this->is_ajax();
+    }
 
     /**
      * 判断是否ajax请求
      * @return bool
      */
-    function is_ajax()
+    public function is_ajax()
     {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtoupper($_SERVER['HTTP_X_REQUESTED_WITH'])=='XMLHTTPREQUEST';
     }
@@ -151,7 +160,7 @@ Class show{
     /**
      * phpshow路由处理
      * 规则只有一种
-     * /ct/ac/
+     * /ct/ac
      * /module/ct/ac
      */
     public function miniroute()
@@ -183,15 +192,47 @@ Class show{
     /**
      * 程序结束时的调用
      */
-    public function page_close()
+    public function end()
     {
         $memory = memory_get_usage();
-        $entime = microtime(true);
-        $usetime = $entime - $this->starttime;
+        $endtime = microtime(true);
+        $usetime = $endtime - $this->starttime;
         \phpshow\lib\debug::show_debug_error();
         echo lr."使用内存:".util::bunit_convert($memory - $this->memory);
         echo lr."使用时间:".sprintf('%.2f',$usetime)." sec";
     }
+
+    /**
+     * 容器的绑定
+     * @param $abstract
+     * @param $concrete
+     */
+    public function bind($abstract,$concrete){
+        $this->bindings[$abstract]=$concrete;
+    }
+
+    /**
+     * 容器调用
+     * @param $abstract
+     * @param array $parameters
+     * @return mixed
+     */
+    public function make($abstract,$parameters=[]){
+        return call_user_func_array($this->bindings[$abstract],$parameters);
+    }
 }
+
+
+
 $show = new show();
+//根据需要，调用就行
+$show->bind('db',function($arg1,$arg2){
+//    return new DB();
+});
+$show->bind('session',function($arg1,$arg2){
+//    return new Session();
+});
+
 $show->hello();
+
+
