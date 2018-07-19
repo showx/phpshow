@@ -4,14 +4,25 @@
  * Author:show
  */
 namespace phpshow;
+use \helper\util as util;
+
+
+
 //错误等级定义
 error_reporting( E_ALL );
 define("PS_PATH",dirname(__FILE__));
-define("PS_CONFIG_PATH",dirname(__FILE__)."/config/");
-define("PS_HELPER_PATH",dirname(__FILE__)."/helper/");
-define("PS_LIB_PATH",dirname(__FILE__)."/lib/");
+define("PS_CONFIG_PATH",PS_PATH."/config/");
+define("PS_HELPER_PATH",PS_PATH."/helper/");
+define("PS_LIB_PATH",PS_PATH."/lib/");
 define("PS_CORE","1111");
-
+if( PHP_SAPI == 'cli' )
+{
+    define('run_mode','2');
+    define('lr','\n');
+}else{
+    define('run_mode','1');
+    define('lr','<br/>');
+}
 require_once PS_HELPER_PATH.'/function.php';
 if ( ini_get('register_globals') )
 {
@@ -34,6 +45,8 @@ Class show{
     private $date_timestamp;
     //框架使用内存
     public $memory = 0;
+    //是否ajax请求
+    public $is_ajax = false;
     //框架错误代码
     public $errno = 0;
     //框架配置文件
@@ -43,24 +56,13 @@ Class show{
     public $ac = 'index';
     public function __construct()
     {
-        $this->starttime = microtime();
+        $this->starttime = microtime(true);
         $this->date_timestamp = time();
         $this->memory = memory_get_usage();
-        if( PHP_SAPI == 'cli' )
-        {
-            define('run_mode','2');
-            define('lr','\n');
-        }else{
-            define('run_mode','1');
-            define('lr','<br/>');
-        }
         spl_autoload_register(array($this, 'autoload'));
         //增加上composer加载
         require PS_PATH.'/composer/vendor/autoload.php';
         //默认必定的加载的类
-//        include_once PS_PATH.'/request.php';
-        include_once PS_PATH.'/response.php';
-        include_once PS_PATH.'/lib/debug.php';
         request::init();
         $this->miniroute();
         //发生异常的记录
@@ -70,10 +72,15 @@ Class show{
         //页面结束调用
         register_shutdown_function(array($this, 'page_close'));
     }
-    public function convert($size)
+
+
+    /**
+     * 判断是否ajax请求
+     * @return bool
+     */
+    function is_ajax()
     {
-        $unit=array('b','kb','mb','gb','tb','pb');
-        return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtoupper($_SERVER['HTTP_X_REQUESTED_WITH'])=='XMLHTTPREQUEST';
     }
 
     /**
@@ -102,9 +109,9 @@ Class show{
             "phpshow" => "",
         );
         $file = str_replace('\\', DIRECTORY_SEPARATOR, $classname).'.php';
-        $file = PS_PATH.str_replace('phpshow', '', $file);
+        $file = PS_PATH.'/'.str_replace('phpshow', '', $file);
         //这里加载的文件输出到debug框
-//        echo $classname."----".$file;
+//        echo lr.$classname."----".$file.lr;
         if (file_exists($file)) {
             require $file;
             return true;
@@ -179,9 +186,11 @@ Class show{
     public function page_close()
     {
         $memory = memory_get_usage();
+        $entime = microtime(true);
+        $usetime = $entime - $this->starttime;
         \phpshow\lib\debug::show_debug_error();
-        echo lr."使用内存:".$this->convert($memory - $this->memory);
-
+        echo lr."使用内存:".util::bunit_convert($memory - $this->memory);
+        echo lr."使用时间:".sprintf('%.2f',$usetime)." sec";
     }
 }
 $show = new show();

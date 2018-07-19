@@ -6,7 +6,7 @@
  * Date: 2018/7/19
  * Time: 上午9:37
  */
-
+namespace helper;
 class util
 {
     /**
@@ -126,7 +126,16 @@ class util
         return $tstr;
     }
 
-
+    /**
+     * 转换单位
+     * @param $size
+     * @return string
+     */
+    public function bunit_convert($size)
+    {
+        $unit=array('b','kb','mb','gb','tb','pb');
+        return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+    }
 
 
 }
