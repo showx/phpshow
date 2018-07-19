@@ -14,3 +14,6 @@ phpshow,简单易用的php框架
 版本1.0
 # 服务器环境
 Nginx + php7以上 + mysql
+
+## 协议
+phpshow 的开源协议为 Apache-2.0，详情参见[LICENSE](LICENSE)
