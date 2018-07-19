@@ -12,7 +12,23 @@ namespace phpshow;
 
 class control
 {
-    public function welcome()
+    public function __construct()
+    {
+        self::_Acl();
+    }
+
+    /**
+     * 判断权限
+     */
+    public function _Acl()
+    {
+
+    }
+
+    /**
+     * 输出版本
+     */
+    final public function welcome()
     {
         echo 'phpshow';
     }
