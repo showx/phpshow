@@ -31,6 +31,7 @@ Class debug
      */
     public static function handler_debug_error($errno, $errmsg, $filename, $linenum, $vars)
     {
+//        var_dump($errno,$errmsg);exit();
         $err = self::debug_format_errmsg('debug', $errno, $errmsg, $filename, $linenum, $vars);
         if( $err != '@' )
         {
@@ -76,7 +77,8 @@ Class debug
         $not_save_error = array(E_USER_ERROR, E_USER_WARNING, E_USER_NOTICE, E_NOTICE, E_USER_WARNING, E_WARNING);
         if( !in_array($errno, $not_save_error) )
         {
-            return '@';
+            //错误类型为0
+//            return '@';
         }
         //读取源码指定行
         if( !is_file($filename) )

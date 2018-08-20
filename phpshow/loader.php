@@ -76,6 +76,10 @@ Class show{
      */
     public function begin()
     {
+        $this->autoloader = array(
+            "ctl_" => "/control/",
+            "mod_" => "/model/",
+        );
         $this->starttime = microtime(true);
         $this->date_timestamp = time();
         $this->memory = memory_get_usage();
@@ -89,7 +93,7 @@ Class show{
     {
         if($auto_arr)
         {
-            $this->autolader = $auto_arr;
+            $this->autolader = array_merge($this->autolader,$auto_arr);
         }
     }
     /**
@@ -105,27 +109,22 @@ Class show{
         }
         $file = str_replace('\\', DIRECTORY_SEPARATOR, $classname).'.php';
         $file = PS_PATH.'/'.str_replace('phpshow', '', $file);
+//        echo $file.lr;
         //这里加载的文件输出到debug框
         $this->loader_file[$classname] = $file;
         if (file_exists($file)) {
-            require $file;
+            require_once $file;
             return true;
         }
-        $autoloader = array(
-            "ctl_" => "/control/",
-            "mod_" => "/model/",
-        );
 
         $filename = basename($file);
         $filename_sub = substr($filename,0,4);
-        if(array_key_exists($filename_sub,$autoloader))
+        if(array_key_exists($filename_sub,$this->autoloader))
         {
-            $filepath = PS_APP_PATH.$autoloader[$filename_sub].$filename;
-            echo "require file:".$filepath.lr;
+            $filepath = PS_APP_PATH.$this->autoloader[$filename_sub].$filename;
             require_once $filepath;
+            return true;
         }
-
-
         return false;
     }
 
@@ -138,6 +137,7 @@ Class show{
         $this->config['db'] = include PS_CONFIG_PATH.'/database.php';
         $this->config['site'] = include PS_CONFIG_PATH.'/site.php';
         $this->config['route_rule'] = include PS_CONFIG_PATH.'/route_rule.php';
+        //other?
     }
 
     /**

@@ -1,5 +1,6 @@
 <?php
 use \phpshow\control;
+use \phpshow\lib\db;
 /**
  * Created by PhpStorm.
  * User: pengyongsheng
@@ -11,5 +12,6 @@ class ctl_index extends control
     public function index()
     {
         echo 'hello world!';
+
     }
 }
