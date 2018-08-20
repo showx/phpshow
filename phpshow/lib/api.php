@@ -1,13 +1,14 @@
 <?php
 /**
- * mysql类
+ * api请求类
  * Created by PhpStorm.
  * User: shengsheng
- * Date: 2018/7/19
- * Time: 上午12:43
  */
+
 namespace phpshow\lib;
-class mysql
+use \phpshow\response;
+
+class api extends response
 {
 
 }

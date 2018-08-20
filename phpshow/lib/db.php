@@ -11,5 +11,9 @@ namespace phpshow\lib;
 
 class db
 {
-
+    public $link;
+    public function __construct()
+    {
+        mysqli_connect();
+    }
 }

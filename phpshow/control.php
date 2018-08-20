@@ -9,7 +9,6 @@
 
 namespace phpshow;
 
-
 class control
 {
     //是否ajax请求
@@ -34,7 +33,7 @@ class control
      */
     public function is_ajax()
     {
-        if(PG_ISAJAX) return true;
+        if(PS_ISAJAX) return true;
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtoupper($_SERVER['HTTP_X_REQUESTED_WITH'])=='XMLHTTPREQUEST';
     }
 

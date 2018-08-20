@@ -115,4 +115,44 @@ class http
         }
         return $result;
     }
+
+    /**
+     * 向指定网址post文件
+     * @parem $url
+     * @parem $files  文件数组 array('fieldname' => filepathname ...)
+     * @param $fields 附加的数组  array('fieldname' => content ...)
+     * @parem $$timeout=30
+     * @parem $referer_url=''
+     * @return string
+     */
+    public function http_post_file($url, $files, $fields, $timeout=30, $referer_url='')
+    {
+        $startt = time();
+        if( function_exists('curl_init') )
+        {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+            curl_setopt($ch, CURLOPT_USERAGENT, self::$user_agent );
+            $need_class = class_exists('\CURLFile') ? true : false;
+            foreach($files as $k => $v)
+            {
+                if ( $need_class ) {
+                    $fields[$k] = new CURLFile(realpath($v));
+                } else {
+                    $fields[$k] = '@' . realpath($v);
+                }
+            }
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            curl_close($ch);
+            return $result;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }

@@ -10,12 +10,15 @@ use \helper\util as util;
 //错误等级定义
 error_reporting( E_ALL );
 defined("PS_DEBUG") or define("PS_DEUBG","1");
-defined("PG_ISAJAX") or define("PG_ISAJAX",false);
+defined("PS_ISAJAX") or define("PS_ISAJAX",false);
 define("PS_PATH",dirname(__FILE__));
 define("PS_CONFIG_PATH",PS_PATH."/config/");
 define("PS_HELPER_PATH",PS_PATH."/helper/");
+define("PS_RUNTIME",PS_PATH."/runtime/");
 define("PS_LIB_PATH",PS_PATH."/lib/");
 define("PS_CORE","1111");
+
+//php_sapi_name()
 if( PHP_SAPI == 'cli' )
 {
     define('run_mode','2');
@@ -100,9 +103,6 @@ Class show{
             //已经加载过返回true
             return true;
         }
-        $autoloader = array(
-            "phpshow" => "",
-        );
         $file = str_replace('\\', DIRECTORY_SEPARATOR, $classname).'.php';
         $file = PS_PATH.'/'.str_replace('phpshow', '', $file);
         //这里加载的文件输出到debug框
@@ -111,6 +111,21 @@ Class show{
             require $file;
             return true;
         }
+        $autoloader = array(
+            "ctl_" => "/control/",
+            "mod_" => "/model/",
+        );
+
+        $filename = basename($file);
+        $filename_sub = substr($filename,0,4);
+        if(array_key_exists($filename_sub,$autoloader))
+        {
+            $filepath = PS_APP_PATH.$autoloader[$filename_sub].$filename;
+            echo "require file:".$filepath.lr;
+            require_once $filepath;
+        }
+
+
         return false;
     }
 
@@ -143,8 +158,14 @@ Class show{
         $path = explode("/",$path);
         $this->ct = request::item("ct") ?? $this->ct;
         $this->ac = request::item("ac") ?? $this->ac;
-        $this->ct = $path['1'] ?? $this->ct;
-        $this->ac = $path['2'] ?? $this->ac;
+        if(!empty($path['1']))
+        {
+            $this->ct = $path['1'];
+        }
+        if(!empty($path['2']))
+        {
+            $this->ac = $path['2'];
+        }
         $this->ct = preg_replace('/([^0-9a-z_])+/is','',$this->ct);
         $this->ac = preg_replace('/([^0-9a-z_])+/is','',$this->ac);
     }
@@ -176,7 +197,7 @@ Class show{
      * @param $concrete
      */
     public function bind($abstract,$concrete){
-        $this->bindings[$abstract]=$concrete;
+        $this->bindings[$abstract] = $concrete;
     }
 
     /**
@@ -188,9 +209,35 @@ Class show{
     public function make($abstract,$parameters=[]){
         return call_user_func_array($this->bindings[$abstract],$parameters);
     }
+
+    public function run()
+    {
+
+        $ctl  = 'ctl_'.$this->ct;
+        if( method_exists ( $ctl, $this->ac ) === true )
+        {
+            $instance = new $ctl;
+            $instance->{$this->ac}();
+        } else {
+            die('wrong place');
+        }
+    }
+
 }
+
 //App加载类
 Class App{
+
+    public static $master;
+
+    public static function start()
+    {
+        self::$master = new show();
+        self::$master->bind('db',function(){
+            return new db();
+        });
+        self::$master->run();
+    }
     public $result = array();
     /**
      * 临时读取
@@ -212,24 +259,18 @@ Class App{
     }
 
     /**
-     * 设置数据
-     * @param $data
+     * 获取本地配置
+     * @param string $key
+     * @return mixed
      */
-    public static function setHandler($data)
+    public static function getConfig($key='')
     {
-
+        return self::$master->config[$key];
     }
+
+
 }
-
-$show = new show();
-//根据需要，调用就行
-$show->bind('db',function($arg1,$arg2){
-//    return new DB();
-});
-$show->bind('session',function($arg1,$arg2){
-//    return new Session();
-});
-
-$show->hello();
+App::start();
+//App::$master->hello();
 
 

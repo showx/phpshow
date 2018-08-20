@@ -17,7 +17,7 @@ class response
     /**
      * 输出json
      */
-    public static function json($code='0',$msg,$data)
+    public static function json($code='0',$msg='',$data='')
     {
         $result = array(
             'code' => $code,
