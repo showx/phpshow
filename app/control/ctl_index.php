@@ -1,6 +1,7 @@
 <?php
 use \phpshow\control;
 use \phpshow\lib\db;
+use \phpshow\lib\tpl;
 /**
  * Created by PhpStorm.
  * User: pengyongsheng
@@ -12,6 +13,10 @@ class ctl_index extends control
     public function index()
     {
         echo 'hello world!';
+//        $db = \phpshow\App::getC("db");
+//        $result = $db->get_all("select * from test");
+//        var_dump($result);
 
+        tpl::display("index");
     }
 }

@@ -10,4 +10,8 @@ return [
     'session_dir' => '',
     'domain' => '',
     'cookie_domain' => '',
+    'cookie_pwd' => 'oSEx@uuw!ppr',
+    'debug' => false,
+    'dev' => false,
+    'version' => '1.0',
 ];

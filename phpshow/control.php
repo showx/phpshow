@@ -8,6 +8,7 @@
  */
 
 namespace phpshow;
+use \phpshow\lib\tpl;
 
 class control
 {
