@@ -229,16 +229,37 @@ Class show{
 Class App{
 
     public static $master;
-
+    public $result = array();
     public static function start()
     {
         self::$master = new show();
+        //初始化基本集合
         self::$master->bind('db',function(){
-            return new db();
+            return new \phpshow\lib\db();
+        });
+        self::$master->bind('session',function(){
+            return new \phpshow\lib\session();
         });
         self::$master->run();
     }
-    public $result = array();
+
+    /**
+     * 设置集合
+     * setCollection
+     */
+    public static function setC($collection_name,$collection_obj)
+    {
+        self::$master->bind($collection_name,new $collection_obj());
+    }
+
+    /**
+     * 获取指定的集合
+     */
+    public static function getC($collection)
+    {
+        return self::$master->make($collection);
+    }
+
     /**
      * 临时读取
      * @param $key
@@ -272,5 +293,3 @@ Class App{
 }
 App::start();
 //App::$master->hello();
-
-
