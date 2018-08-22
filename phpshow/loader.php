@@ -213,7 +213,7 @@ Class show{
     public function run()
     {
 
-        $ctl  = 'ctl_'.$this->ct;
+        $ctl  = 'app\control\ctl_'.$this->ct;
         if( method_exists ( $ctl, $this->ac ) === true )
         {
             $instance = new $ctl;
@@ -292,4 +292,5 @@ Class App{
 
 }
 App::start();
+//var_dump(get_included_files());
 //App::$master->hello();

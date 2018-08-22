@@ -1,4 +1,5 @@
 <?php
+namespace app;
 //定义工程
 define("PS_APP_NAME","hello");
 define("PS_APP_PATH",dirname(__FILE__));
