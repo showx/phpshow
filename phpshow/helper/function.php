@@ -37,3 +37,9 @@ function lookdata($data)
     echo var_export($data,true);
     echo '</div>';
 }
+
+//--------tpl相关---------
+function include_file()
+{
+    \phpshow\lib\tpl::include_file("header");
+}

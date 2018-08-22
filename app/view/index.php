@@ -1,3 +1,3 @@
 <?php
-use \phpshow\lib\tpl;
-tpl::include("header");?>
+include_file("header");
+?>

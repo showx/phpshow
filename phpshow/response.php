@@ -15,6 +15,16 @@ class response
     }
 
     /**
+     * url跳转
+     * @param string $url
+     */
+    public static function redirect($url="")
+    {
+        header('Location:'.$url);
+        exit();
+    }
+
+    /**
      * 输出json
      */
     public static function json($code='0',$msg='',$data='')

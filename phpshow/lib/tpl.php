@@ -14,7 +14,9 @@ class tpl
 {
     public $instance = null;
     //路径
-    private $path = "";
+    private $path = PS_APP_PATH.'/view/';
+    //数据集合
+    public $tpl_result = array();
 
     public static function init()
     {
@@ -22,6 +24,16 @@ class tpl
         {
             self::$instance = new self();
         }
+    }
+
+    /**
+     * 数据赋值
+     * @param $key
+     * @param $value
+     */
+    public static function assign($key,$value)
+    {
+        self::$tpl_result[$key] = $value;
     }
 
     /**
