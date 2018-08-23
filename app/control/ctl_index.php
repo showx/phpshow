@@ -11,6 +11,6 @@ class ctl_index extends \control
 {
     public function index()
     {
-        \tpl::display("index");
+        \tpl::display();
     }
 }

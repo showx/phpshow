@@ -25,41 +25,47 @@ class log
             $this->type = 2;
         }
     }
-    public function log($data,$type='info')
+    public function _action($data,$type='info')
     {
         if($this->type==2)
         {
-//            \SeasLog::log($type,$data);
             call_user_func_array("\SeasLog::{$type}",array($data));
+        }
+    }
+    public function log($data,$type='')
+    {
+        if($this->type==2)
+        {
+            \SeasLog::log($type, $data);
         }
     }
     public function debug($data)
     {
-        $this->log($data,__FUNCTION__);
+        $this->_action($data,__FUNCTION__);
     }
     public function info($data)
     {
-        $this->log($data,__FUNCTION__);
+        $this->_action($data,__FUNCTION__);
     }
     public function notice($data)
     {
-        $this->log($data,__FUNCTION__);
+        $this->_action($data,__FUNCTION__);
     }
     public function error($data)
     {
-        $this->log($data,__FUNCTION__);
+        $this->_action($data,__FUNCTION__);
     }
     public function critical($data)
     {
-        $this->log($data,__FUNCTION__);
+        $this->_action($data,__FUNCTION__);
     }
     public function alert($data)
     {
-        $this->log($data,__FUNCTION__);
+        $this->_action($data,__FUNCTION__);
     }
     public function emergency($data)
     {
-        $this->log($data,__FUNCTION__);
+        $this->_action($data,__FUNCTION__);
     }
 
     /**

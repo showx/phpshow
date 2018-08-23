@@ -48,8 +48,12 @@ class tpl
      * 显示模板
      * @param $file_name
      */
-    public static function display($file_name)
+    public static function display($file_name = '')
     {
+        if(empty($file_name))
+        {
+            $file_name = \phpshow\App::$master->ac;
+        }
         include_once PS_APP_PATH.'/view/'.$file_name.".php";
     }
 }

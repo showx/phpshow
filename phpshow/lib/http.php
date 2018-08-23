@@ -125,7 +125,7 @@ class http
      * @parem $referer_url=''
      * @return string
      */
-    public function http_post_file($url, $files, $fields, $timeout=30, $referer_url='')
+    public function post_file($url, $files, $fields, $timeout=30, $referer_url='')
     {
         $startt = time();
         if( function_exists('curl_init') )

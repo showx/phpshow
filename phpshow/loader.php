@@ -212,6 +212,10 @@ Class show{
         $this->bindings[$abstract] = $concrete;
     }
 
+    /**
+     * 增加别名
+     * @param array $result_me
+     */
     public function addClassAlias(Array $result_me = [])
     {
         $result = [
