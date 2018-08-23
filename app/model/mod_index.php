@@ -9,7 +9,7 @@ use phpshow\model;
  */
 class mod_index extends model
 {
-    public function index()
+    public static function index()
     {
 
     }
