@@ -14,6 +14,10 @@ class ctl_index extends control
 {
     public function index()
     {
+
+        $log = new \phpshow\lib\log();
+        $log->info("shjow");
+
         tpl::display("index");
     }
 }
