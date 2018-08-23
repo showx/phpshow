@@ -1,6 +1,8 @@
 <?php
 namespace app\control;
 
+use \app\model\mod_index;
+
 /**
  * Created by PhpStorm.
  * User: pengyongsheng

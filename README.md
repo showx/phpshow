@@ -10,10 +10,15 @@ phpshow,简单易用的php框架
 ```
 
 # 框架介绍
-简单的mvc,快速开发而生
-版本1.0
+1.  简单的mvc,快速开发而生
+2.  版本1.0
 # 服务器环境
-Nginx + php7以上 + mysql
+1.  Nginx + php7以上 + mysql
+2.  php扩展seaslog、swoole、redis
 
 ## 协议
 phpshow 的开源协议为 Apache-2.0，详情参见[LICENSE](LICENSE)
+
+## php配置
+### php.ini
+1.  short_open_tag = On  ;php短标记打开 <? ?>,模板要使用这样的标记
