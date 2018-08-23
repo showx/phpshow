@@ -1,6 +1,8 @@
 <?php
 namespace app\model;
 
+use phpshow\model;
+
 /**
  * Created by PhpStorm.
  * User: pengyongsheng

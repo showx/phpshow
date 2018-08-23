@@ -26,10 +26,11 @@ class db
      */
     public function connect()
     {
-        $config = \phpshow\App::getConfig("db")['mysql'];
+        $config = \phpshow\App::getConfig("db")['mysql']['master'];
         $this->conn = mysqli_connect($config['host'],$config['username'],$config['password'],$config['dbname'],$config['port']) or die('mysql connect error');
 //        mysqli_select_db($this->conn,$config['dbname']);
 //        $this->query(" use `{$dbname}`; ");
+        return $this->conn;
     }
 
     /**
