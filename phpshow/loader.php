@@ -141,6 +141,16 @@ Class show{
     }
 
     /**
+     * 加载配置文件
+     * @param $key
+     * @param $value
+     */
+    public function loadConfig($key,$value)
+    {
+        $this->config[$key] = include PS_CONFIG_PATH."/".$value;
+    }
+
+    /**
      * phpshow路由处理
      * 规则只有一种
      * /ct/ac
@@ -200,7 +210,7 @@ Class show{
         $this->bindings[$abstract] = $concrete;
     }
 
-    public function addClassAlias(Array $result = [])
+    public function addClassAlias(Array $result_me = [])
     {
         $result = [
             'log' => 'phpshow\lib\log',
@@ -213,6 +223,10 @@ Class show{
             'http' => 'phpshow\lib\http',
             'psredis' => 'phpshow\lib\psredis',
         ];
+        if(!empty($result_me))
+        {
+            $result = array_merge($result,$result_me);
+        }
         foreach($result as $key=>$val)
         {
             class_alias($val, '\\'.$key);
@@ -309,9 +323,18 @@ Class App{
         return self::$master->config[$key];
     }
 
+    /**
+     * 获取master
+     * @param $method
+     * @param $arguments
+     * @return mixed
+     */
+    public static function __callStatic($method, $arguments)
+    {
+        return call_user_func_array(array(self::$master,$method),$arguments);
+    }
+
 
 }
 
 App::start();
-//var_dump(get_included_files());
-//App::$master->hello();

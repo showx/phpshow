@@ -27,6 +27,16 @@ Class debug
     private static $_debug_error_msg;
 
     /**
+     * 获取加载的文件
+     * @return string[]
+     */
+    public static function get_include_file()
+    {
+        $files = get_included_files();
+        return $files;
+    }
+
+    /**
      * 错误接管函数
      */
     public static function handler_debug_error($errno, $errmsg, $filename, $linenum, $vars)
