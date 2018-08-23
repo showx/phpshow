@@ -14,7 +14,14 @@ namespace phpshow\lib;
 ini_set('session.gc_divisor', 1000);
 ini_set('session.gc_probability', 1000);
 session_write_close();
-session_set_save_handler("session::init", "session::close", "session::read","session::write", "session::destroy", "session::gc");
+session_set_save_handler(
+    "\phpshow\lib\session::init",
+    "\phpshow\lib\session::close",
+    "\phpshow\lib\session::read",
+    "\phpshow\lib\session::write",
+    "\phpshow\lib\session::destroy",
+    "\phpshow\lib\session::gc"
+);
 session_save_path( PS_RUNTIME.'/session' );
 
 

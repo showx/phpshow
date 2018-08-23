@@ -200,6 +200,24 @@ Class show{
         $this->bindings[$abstract] = $concrete;
     }
 
+    public function addClassAlias(Array $result = [])
+    {
+        $result = [
+            'log' => 'phpshow\lib\log',
+            'acl' => 'phpshow\lib\acl',
+            'api' => 'phpshow\lib\api',
+            'db' => 'phpshow\lib\db',
+            'debug' => 'phpshow\lib\debug',
+            'facade' => 'phpshow\lib\facade',
+            'session' => 'phpshow\lib\session',
+            'http' => 'phpshow\lib\http',
+            'psredis' => 'phpshow\lib\psredis',
+        ];
+        foreach($result as $key=>$val)
+        {
+            class_alias($val, '\\'.$key);
+        }
+    }
     /**
      * 容器调用
      * @param $abstract
@@ -233,6 +251,8 @@ Class App{
     public static function start()
     {
         self::$master = new show();
+        self::$master->addClassAlias();
+
         //初始化基本集合
         self::$master->bind('db',function(){
             return new \phpshow\lib\db();
@@ -291,6 +311,7 @@ Class App{
 
 
 }
+
 App::start();
 //var_dump(get_included_files());
 //App::$master->hello();

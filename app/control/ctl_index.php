@@ -4,6 +4,7 @@ namespace app\control;
 use \phpshow\control;
 use \phpshow\lib\db;
 use \phpshow\lib\tpl;
+
 /**
  * Created by PhpStorm.
  * User: pengyongsheng
@@ -14,9 +15,8 @@ class ctl_index extends control
 {
     public function index()
     {
-
-        $log = new \phpshow\lib\log();
-        $log->info("shjow");
+        $log = new \log();
+        $log->info("shjowbbq");
 
         tpl::display("index");
     }
