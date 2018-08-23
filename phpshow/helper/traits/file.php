@@ -5,8 +5,8 @@
  * Date: 2018/8/23
  * Time: 上午9:10
  */
-namespace traits;
-trait log{
+namespace phpshow\helper\traits;
+trait file{
     /**
      * 简单调试功能
      */

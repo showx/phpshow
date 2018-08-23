@@ -197,8 +197,10 @@ Class show{
         $endtime = microtime(true);
         $usetime = $endtime - $this->starttime;
         \phpshow\lib\debug::show_debug_error();
-        echo lr."使用内存:".util::bunit_convert($memory - $this->memory);
-        echo lr."使用时间:".sprintf('%.2f',$usetime)." sec";
+
+        $cx_string =  lr."使用内存:".util::bunit_convert($memory - $this->memory);
+        $cx_string .= lr."使用时间:".sprintf('%.2f',$usetime)." sec";
+//        echo $cx_string;
     }
 
     /**
@@ -216,12 +218,17 @@ Class show{
             'log' => 'phpshow\lib\log',
             'acl' => 'phpshow\lib\acl',
             'api' => 'phpshow\lib\api',
+            'tpl' => 'phpshow\lib\tpl',
             'db' => 'phpshow\lib\db',
             'debug' => 'phpshow\lib\debug',
             'facade' => 'phpshow\lib\facade',
             'session' => 'phpshow\lib\session',
             'http' => 'phpshow\lib\http',
             'psredis' => 'phpshow\lib\psredis',
+            'control' => 'phpshow\control',
+            'model' => 'phpshow\model',
+            'request' => 'phpshow\request',
+            'response' => 'phpshow\response',
         ];
         if(!empty($result_me))
         {

@@ -7,7 +7,7 @@ namespace phpshow\helper\facade;
  * Time: 上午9:46
  */
 
-class db extends \phpshow\lib\facade
+class db extends \facade
 {
     public static function getFacadeAccessor(){
         return \phpshow\lib\db::class;
