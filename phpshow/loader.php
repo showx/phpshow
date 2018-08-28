@@ -6,7 +6,6 @@
 namespace phpshow;
 use \helper\util as util;
 
-
 //错误等级定义
 error_reporting( E_ALL );
 defined("PS_DEBUG") or define("PS_DEUBG","1");
@@ -23,6 +22,12 @@ if( PHP_SAPI == 'cli' )
 {
     define('run_mode','2');
     define('lr','\n');
+
+    if($argc>1)
+    {
+        $_POST['ct'] = $argv['1'];
+        $_POST['ac'] = $argv['2'];
+    }
 }else{
     define('run_mode','1');
     define('lr','<br/>');
@@ -161,20 +166,23 @@ Class show{
         $this->config();
         //也可以获取路由规则的
         //读取获取到的参数,ct,ac只能根据url来
-        $url = $_SERVER['REQUEST_URI'];
-        $url = parse_url($url);
-        $path = $url['path'];
-        $query = $url['query'] ?? '';
-        $path = explode("/",$path);
-        $this->ct = request::item("ct") ?? $this->ct;
-        $this->ac = request::item("ac") ?? $this->ac;
-        if(!empty($path['1']))
+        if(run_mode == '1')
         {
-            $this->ct = $path['1'];
-        }
-        if(!empty($path['2']))
-        {
-            $this->ac = $path['2'];
+            $url = $_SERVER['REQUEST_URI'];
+            $url = parse_url($url);
+            $path = $url['path'];
+            $query = $url['query'] ?? '';
+            $path = explode("/",$path);
+            $this->ct = request::item("ct") ?? $this->ct;
+            $this->ac = request::item("ac") ?? $this->ac;
+            if(!empty($path['1']))
+            {
+                $this->ct = $path['1'];
+            }
+            if(!empty($path['2']))
+            {
+                $this->ac = $path['2'];
+            }
         }
         $this->ct = preg_replace('/([^0-9a-z_])+/is','',$this->ct);
         $this->ac = preg_replace('/([^0-9a-z_])+/is','',$this->ac);
@@ -226,14 +234,19 @@ Class show{
             'db' => 'phpshow\lib\db',
             'debug' => 'phpshow\lib\debug',
             'facade' => 'phpshow\lib\facade',
-            'session' => 'phpshow\lib\session',
             'http' => 'phpshow\lib\http',
             'psredis' => 'phpshow\lib\psredis',
             'control' => 'phpshow\control',
             'model' => 'phpshow\model',
             'request' => 'phpshow\request',
             'response' => 'phpshow\response',
+
+
         ];
+        if(run_mode =='1')
+        {
+            $result['session'] = 'phpshow\lib\session';
+        }
         if(!empty($result_me))
         {
             $result = array_merge($result,$result_me);
