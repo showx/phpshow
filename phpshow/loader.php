@@ -22,15 +22,11 @@ if( PHP_SAPI == 'cli' )
 {
     define('run_mode','2');
     define('lr','\n');
-
-    if($argc>1)
-    {
-        $_POST['ct'] = $argv['1'];
-        $_POST['ac'] = $argv['2'];
-    }
 }else{
     define('run_mode','1');
     define('lr','<br/>');
+    $argc = '';
+    $argv = [];
 }
 require_once PS_HELPER_PATH.'/function.php';
 if ( ini_get('register_globals') )
@@ -67,7 +63,7 @@ Class show{
         require PS_PATH.'/composer/vendor/autoload.php';
         //默认必定的加载的类
         request::init();
-        $this->miniroute();
+
         //发生异常的记录
         set_exception_handler(array('\phpshow\lib\debug','handler_debug_exception'));
         //发生错误的记录
@@ -166,6 +162,8 @@ Class show{
         $this->config();
         //也可以获取路由规则的
         //读取获取到的参数,ct,ac只能根据url来
+        $this->ct = !empty(request::item("ct"))?request::item("ct"):$this->ct;
+        $this->ct = !empty(request::item("ac"))?request::item("ac"):$this->ac;
         if(run_mode == '1')
         {
             $url = $_SERVER['REQUEST_URI'];
@@ -173,8 +171,6 @@ Class show{
             $path = $url['path'];
             $query = $url['query'] ?? '';
             $path = explode("/",$path);
-            $this->ct = request::item("ct") ?? $this->ct;
-            $this->ac = request::item("ac") ?? $this->ac;
             if(!empty($path['1']))
             {
                 $this->ct = $path['1'];
@@ -286,11 +282,19 @@ Class App{
 
     public static $master;
     public $result = array();
-    public static function start()
+    public static function start($argc='',$argv='')
     {
         self::$master = new show();
         self::$master->addClassAlias();
-
+        if(run_mode=='2')
+        {
+            if($argc>1)
+            {
+                request::$forms["ct"] = $argv['1'];
+                request::$forms["ac"] = $argv['2'];
+            }
+        }
+        self::$master->miniroute();
         //初始化基本集合
         self::$master->bind('db',function(){
             return new \phpshow\lib\db();
@@ -298,6 +302,10 @@ Class App{
         self::$master->bind('session',function(){
             return new \phpshow\lib\session();
         });
+        self::$master->run();
+    }
+    public static function run()
+    {
         self::$master->run();
     }
 
@@ -360,5 +368,4 @@ Class App{
 
 
 }
-
-App::start();
+App::start($argc,$argv);
