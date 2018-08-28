@@ -21,7 +21,7 @@ define("PS_CORE","1111");
 if( PHP_SAPI == 'cli' )
 {
     define('run_mode','2');
-    define('lr','\n');
+    define('lr',PHP_EOL);
 }else{
     define('run_mode','1');
     define('lr','<br/>');
@@ -163,7 +163,7 @@ Class show{
         //也可以获取路由规则的
         //读取获取到的参数,ct,ac只能根据url来
         $this->ct = !empty(request::item("ct"))?request::item("ct"):$this->ct;
-        $this->ct = !empty(request::item("ac"))?request::item("ac"):$this->ac;
+        $this->ac = !empty(request::item("ac"))?request::item("ac"):$this->ac;
         if(run_mode == '1')
         {
             $url = $_SERVER['REQUEST_URI'];
