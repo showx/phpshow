@@ -12,6 +12,14 @@ namespace phpshow\lib;
 
 class swoole
 {
+    public function __construct()
+    {
+        if(!get_extension_funcs("swoole"))
+        {
+            return false;
+        }
+    }
+
     /**
      * 序列化
      * @param mixed $data

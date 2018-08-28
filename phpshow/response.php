@@ -25,6 +25,15 @@ class response
     }
 
     /**
+     * 禁用服务器缓存
+     */
+    public static function noCache()
+    {
+        header('Cache-Control:no-cache,must-revalidate');
+        header('Pragma:no-cache');
+        header("Expires:0");
+    }
+    /**
      * 输出json
      */
     public static function json($code='0',$msg='',$data='')

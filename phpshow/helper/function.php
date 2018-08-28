@@ -39,7 +39,14 @@ function lookdata($data)
 }
 
 //--------tpl相关---------
-function include_file()
+function tpl_file($file_name)
 {
-    \phpshow\lib\tpl::include_file("header");
+    $file =  \phpshow\lib\tpl::include_file($file_name);
+    return $file;
+}
+//使用语言包
+function lang()
+{
+    setlocale(LC_ALL, '');
+    
 }

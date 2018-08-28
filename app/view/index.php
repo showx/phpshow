@@ -1,3 +1,4 @@
-<? include_file("header");?>
+
+<?include tpl_file("header");?>
 hello world!
-<? include_file("footer");?>
+<? include tpl_file("footer");?>

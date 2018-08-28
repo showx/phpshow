@@ -16,7 +16,7 @@ class tpl
     //路径
     private $path = PS_APP_PATH.'/view/';
     //数据集合
-    public $tpl_result = array();
+    public static $tpl_result = array('test');
 
     public static function init()
     {
@@ -41,7 +41,7 @@ class tpl
      */
     public static function include_file($file_name)
     {
-        include_once PS_APP_PATH.'/view/'.$file_name.".php";
+        return PS_APP_PATH.'/view/'.$file_name.".php";
     }
 
     /**
@@ -54,6 +54,21 @@ class tpl
         {
             $file_name = \phpshow\App::$master->ac;
         }
-        include_once PS_APP_PATH.'/view/'.$file_name.".php";
+        $result = self::$tpl_result;
+        $closure = function($file_name) use($result){
+            $this->result = $result;
+            ob_start();
+            include self::include_file($file_name);
+            return ob_end_flush();
+//            ob_get_clean();
+        };
+        $content = new class() {
+            public $title = 'phpshow';
+            public $result = [];
+        };
+        $closure = $closure->bindTo($content);
+        $closure($file_name);
+
+
     }
 }
