@@ -109,7 +109,7 @@ Class show{
             return true;
         }
         $file = str_replace('\\', DIRECTORY_SEPARATOR, $classname).'.php';
-        $file = PS_PATH.'/'.str_replace('phpshow', '', $file);
+        $file = PS_PATH.DIRECTORY_SEPARATOR.str_replace('phpshow', '', $file);
 //        echo $file.lr;
         //这里加载的文件输出到debug框
         $this->loader_file[$classname] = $file;
@@ -135,9 +135,9 @@ Class show{
      */
     public function config()
     {
-        $this->config['db'] = include PS_CONFIG_PATH.'/database.php';
-        $this->config['site'] = include PS_CONFIG_PATH.'/site.php';
-        $this->config['route_rule'] = include PS_CONFIG_PATH.'/route_rule.php';
+        $this->config['db'] = include PS_CONFIG_PATH.DIRECTORY_SEPARATOR.'database.php';
+        $this->config['site'] = include PS_CONFIG_PATH.DIRECTORY_SEPARATOR.'site.php';
+        $this->config['route_rule'] = include PS_CONFIG_PATH.DIRECTORY_SEPARATOR.'route_rule.php';
         //other?
     }
 
@@ -148,7 +148,7 @@ Class show{
      */
     public function loadConfig($key,$value)
     {
-        $this->config[$key] = include PS_CONFIG_PATH."/".$value;
+        $this->config[$key] = include PS_CONFIG_PATH.DIRECTORY_SEPARATOR.$value;
     }
 
     /**

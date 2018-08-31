@@ -1,16 +1,16 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: pengyongsheng
- * @todo mysql主从
- * Date: 2018/7/19
- * Time: 下午7:29
+ * postgresql连接驱动
+ * User: shengsheng
+ * Date: 2018/8/31
+ * Time: 下午3:04
  */
 
 namespace phpshow\lib;
 
 
-class db
+class pgdb
 {
     //数据库链接
     public $link;
@@ -26,10 +26,15 @@ class db
      */
     public function connect()
     {
-        $config = \phpshow\App::getConfig("db")['mysql']['master'];
-        $this->conn = mysqli_connect($config['host'],$config['username'],$config['password'],$config['dbname'],$config['port']) or die('mysql connect error');
-//        mysqli_select_db($this->conn,$config['dbname']);
-//        $this->query(" use `{$dbname}`; ");
+        $config = \phpshow\App::getConfig("db")['postgresql'];
+        $host        = "host=".$config['host'];
+        $port        = "port=".$config['port'];
+        $dbname      = "dbname=".$config['dbname'];
+        $credentials = "user={$config['username']} password={$config['password']}";
+        $this->conn = pg_connect("$host $port $dbname $credentials");
+        if(!$this->conn){
+            echo "Error : Unable to open pg";
+        }
         return $this->conn;
     }
 
@@ -40,10 +45,6 @@ class db
      */
     public function safe_string($sql)
     {
-        //values addslashes的时候处理
-//        $sql = mysqli_real_escape_string($this->conn,$sql);
-//        $safe_array = array("load file","truncate","--");
-//        str_replace($safe_array,"",$sql);
         return $sql;
     }
 
@@ -57,7 +58,7 @@ class db
         $starttime = microtime(true);
         $sql = $this->safe_string($sql);
 //        echo $sql.lr;
-        $result = mysqli_query($this->conn,$sql);
+        $result = pg_query($this->conn,$sql);
 
         $endtime = microtime(true);
         $lasttime = $endtime - $starttime;
@@ -66,8 +67,8 @@ class db
             //慢查询，保存到sql日志文件
         }
         if (!$result) {
-            $mysql_error = 'Invalid query: ' . mysqli_error($this->conn);
-            echo $mysql_error.lr;
+            $error = 'Invalid query: ' . pg_last_error($this->conn);
+            echo $error.lr;
         }
         return $result;
     }
@@ -77,9 +78,9 @@ class db
      * @param $result
      * @param fetch_type [MYSQLI_NUM|MYSQLI_ASSOC|MYSQLI_BOTH]
      */
-    public function fetch($result,$fetch_type = MYSQLI_ASSOC)
+    public function fetch($result,$fetch_type = PGSQL_ASSOC)
     {
-        while($row=mysqli_fetch_array($result,$fetch_type)) {
+        while($row=pg_fetch_array($result,$fetch_type)) {
             $data[] = $row;
         }
         $this->free( $result );
@@ -89,11 +90,11 @@ class db
     /**
      * 检测mysql连接
      */
-    public function ping(  )
+    public function ping( )
     {
-        if( $this->conn != null && !mysqli_ping( $this->conn ) )
+        if( $this->conn != null && !pg_ping( $this->conn ) )
         {
-            mysqli_close( $this->conn );
+            pg_close( $this->conn );
             $this->conn = null;
             $this->connect();
         }
@@ -105,7 +106,7 @@ class db
      */
     public function free( $rs )
     {
-        return mysqli_free_result( $rs );
+        return pg_free_result( $rs );
     }
 
     /**
@@ -118,7 +119,7 @@ class db
             $sql = $sql." limit 1 ";
         }
         $result = $this->query($sql);
-        $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+        $row = pg_fetch_array($result,NULL,PGSQL_ASSOC);
         $this->free($result);
         return $row;
     }
@@ -129,7 +130,7 @@ class db
     public function get_all($sql)
     {
         $result = $this->query($sql);
-        $row = $this->fetch($result);
+        $row = pg_fetch_all($result,PGSQL_ASSOC);
         return $row;
     }
 
@@ -139,6 +140,5 @@ class db
      */
     public function insert_id()
     {
-        return mysqli_insert_id($this->conn);
     }
 }
