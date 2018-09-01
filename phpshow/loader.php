@@ -160,26 +160,49 @@ Class show{
     public function miniroute()
     {
         $this->config();
+
+        $route_rule = $this->config['route_rule'];
+
         //也可以获取路由规则的
         //读取获取到的参数,ct,ac只能根据url来
         $this->ct = !empty(request::item("ct"))?request::item("ct"):$this->ct;
         $this->ac = !empty(request::item("ac"))?request::item("ac"):$this->ac;
         if(run_mode == '1')
         {
-            $url = $_SERVER['REQUEST_URI'];
-            $url = parse_url($url);
-            $path = $url['path'];
-            $query = $url['query'] ?? '';
+            //QUERY_STRING 参数为s
+            $path = request::item("s");
             $path = explode("/",$path);
-            if(!empty($path['1']))
+            $exits = ['ct','ac'];
+            $i = 0;
+            foreach($path as $key=>$val)
             {
-                $this->ct = $path['1'];
-            }
-            if(!empty($path['2']))
-            {
-                $this->ac = $path['2'];
+                if(!empty($val))
+                {
+                    if($i == 0)
+                    {
+                        $tmp = current($exits);
+                        $this->$tmp = $val;
+                        $i = 1;
+                    }else{
+                        $tmp = next($exits);
+                        $this->$tmp = $val;
+                    }
+                }
             }
         }
+        $rule_index = $this->ct."/".$this->ac;
+        if(isset($route_rule[$rule_index]))
+        {
+            $route_val = $route_rule[$rule_index];
+            if(strpos($route_val,"@"))
+            {
+                $route_val = explode("@",$route_val);
+                $this->ct = $route_val['0'];
+                $this->ac = $route_val['1'];
+            }
+        }
+
+
         $this->ct = preg_replace('/([^0-9a-z_])+/is','',$this->ct);
         $this->ac = preg_replace('/([^0-9a-z_])+/is','',$this->ac);
     }
@@ -201,21 +224,10 @@ Class show{
         $endtime = microtime(true);
         $usetime = $endtime - $this->starttime;
         \phpshow\lib\debug::show_debug_error();
-
         $cx_string =  lr."使用内存:".util::bunit_convert($memory - $this->memory);
         $cx_string .= lr."使用时间:".sprintf('%.2f',$usetime)." sec";
 //        echo $cx_string;
     }
-
-    /**
-     * 容器的绑定
-     * @param $abstract
-     * @param $concrete
-     */
-    public function bind($abstract,$concrete){
-        $this->bindings[$abstract] = $concrete;
-    }
-
     /**
      * 增加别名
      * @param array $result_me
@@ -236,8 +248,6 @@ Class show{
             'model' => 'phpshow\model',
             'request' => 'phpshow\request',
             'response' => 'phpshow\response',
-
-
         ];
         if(run_mode =='1')
         {
@@ -253,6 +263,14 @@ Class show{
         }
     }
     /**
+     * 容器的绑定
+     * @param $abstract
+     * @param $concrete
+     */
+    public function bind($abstract,$concrete){
+        $this->bindings[$abstract] = $concrete;
+    }
+    /**
      * 容器调用
      * @param $abstract
      * @param array $parameters
@@ -264,15 +282,21 @@ Class show{
 
     public function run()
     {
-
-        $ctl  = 'app\control\ctl_'.$this->ct;
-        if( method_exists ( $ctl, $this->ac ) === true )
+        try{
+            $ctl  = 'app\control\ctl_'.$this->ct;
+            if( method_exists ( $ctl, $this->ac ) === true )
+            {
+                $instance = new $ctl;
+                $instance->{$this->ac}();
+            } else {
+                throw new \Exception('fucking control..');
+            }
+        }catch(\Throwable $e)
         {
-            $instance = new $ctl;
-            $instance->{$this->ac}();
-        } else {
-            die('wrong place');
+//            var_dump($e);
+            //这种异常写日志
         }
+
     }
 
 }
@@ -295,13 +319,10 @@ Class App{
             }
         }
         self::$master->miniroute();
-        //初始化基本集合
-        self::$master->bind('db',function(){
-            return new \phpshow\lib\db();
-        });
-        self::$master->bind('session',function(){
-            return new \phpshow\lib\session();
-        });
+        //初始化基本集合 关闭db初始化
+//        self::$master->bind('db',function(){
+//            return new \phpshow\lib\db();
+//        });
         self::$master->run();
     }
     public static function run()

@@ -6,4 +6,6 @@
  * Date: 2018/7/19
  * Time: 下午7:54
  */
-return [];
+return [
+    'index/test' => 'index@conf',
+];
