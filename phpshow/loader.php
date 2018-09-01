@@ -121,11 +121,15 @@ Class show{
 
         $filename = basename($file);
         $filename_sub = substr($filename,0,4);
-        if(array_key_exists($filename_sub,$this->autoloader))
+
+        if(defined('PS_APP_PATH'))
         {
-            $filepath = PS_APP_PATH.$this->autoloader[$filename_sub].$filename;
-            require_once $filepath;
-            return true;
+            if(array_key_exists($filename_sub,$this->autoloader))
+            {
+                $filepath = PS_APP_PATH.$this->autoloader[$filename_sub].$filename;
+                require_once $filepath;
+                return true;
+            }
         }
         return false;
     }

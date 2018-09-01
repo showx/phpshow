@@ -135,6 +135,11 @@ Class debug
             $nowtime = date('Y-m-d H:i:s');
             $err = "Time: ".$nowtime.' @URL: '.$nowurl."\n";
         }
+        if(run_mode == '2')
+        {
+            $err = "error:".$errno.", errmsg:".$errmsg.", filename:".$filename.", linenum:".$linenum.lr;
+            return $err;
+        }
         if( empty(self::$_debug_errortype[$errno]) )
         {
             self::$_debug_errortype[$errno] = "<font color='#466820'>手动抛出</font>";
@@ -178,23 +183,28 @@ Class debug
         {
             return '';
         }
-        if( self::$_debug_error_msg != '' )
+        if(run_mode == 2)
         {
-            $js  = '<script language=\'javascript\'>';
-            $js .= 'function debug_close_all() {';
-            $js .= '    document.getElementById(\'debug_ctl\').style.display=\'none\';';
-            $js .= '    document.getElementById(\'debug_errdiv\').style.display=\'none\';';
-            $js .= '}</script>';
-            echo $js;
-            echo '<div id="debug_ctl" style="width:100px;line-height:24px;position:absolute;top:5px;left:800px;border:1px solid #ccc; background: #FBFDE3; padding:2px;text-align:center">'."\n";
-            echo '<a href="#" target="_self" onclick="javascript:document.getElementById(\'debug_errdiv\').style.display=\'block\';" style="font-size:12px;">[打开调试信息]</a>'."\n";
-            echo '</div>'."\n";
-            echo '<div id="debug_errdiv" style="width:80%;position:absolute;top:10px;left:8px;border:2px solid #ccc; background: #fff; padding:8px;display:none">';
-            echo '<div style="line-height:24px; background: #FBFEEF;;"><div style="float:left"><strong>PHPSHOW框架应用错误/警告信息追踪：</strong></div><div style="float:right"><a href="#" onclick="javascript:debug_close_all();" target="_self">[关闭全部]</a></div>';
-            echo '<br style="clear:both"/></div>';
             echo self::$_debug_error_msg;
-            echo '<br style="clear:both"/></div>';
+        }else{
+            if( self::$_debug_error_msg != '' )
+            {
+                $js  = '<script language=\'javascript\'>';
+                $js .= 'function debug_close_all() {';
+                $js .= '    document.getElementById(\'debug_ctl\').style.display=\'none\';';
+                $js .= '    document.getElementById(\'debug_errdiv\').style.display=\'none\';';
+                $js .= '}</script>';
+                echo $js;
+                echo '<div id="debug_ctl" style="width:100px;line-height:24px;position:absolute;top:5px;left:800px;border:1px solid #ccc; background: #FBFDE3; padding:2px;text-align:center">'."\n";
+                echo '<a href="#" target="_self" onclick="javascript:document.getElementById(\'debug_errdiv\').style.display=\'block\';" style="font-size:12px;">[打开调试信息]</a>'."\n";
+                echo '</div>'."\n";
+                echo '<div id="debug_errdiv" style="width:80%;position:absolute;top:10px;left:8px;border:2px solid #ccc; background: #fff; padding:8px;display:none">';
+                echo '<div style="line-height:24px; background: #FBFEEF;;"><div style="float:left"><strong>PHPSHOW框架应用错误/警告信息追踪：</strong></div><div style="float:right"><a href="#" onclick="javascript:debug_close_all();" target="_self">[关闭全部]</a></div>';
+                echo '<br style="clear:both"/></div>';
+                echo self::$_debug_error_msg;
+                echo '<br style="clear:both"/></div>';
 
+            }
         }
     }
 
