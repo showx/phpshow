@@ -44,9 +44,13 @@ function tpl_file($file_name)
     $file =  \phpshow\lib\tpl::include_file($file_name);
     return $file;
 }
-//使用语言包
-function lang()
+function setlang($lang = 'zh_CN')
 {
-    setlocale(LC_ALL, '');
-    
+//    putenv('LANG='.$lang );
+    setlocale(LC_ALL, $lang);
+}
+//获取语言包的文字
+function getlang($key)
+{
+    return \phpshow\App::$master->lang[$key];
 }

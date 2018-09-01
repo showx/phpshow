@@ -11,6 +11,8 @@ return [
     'domain' => '',
     'cookie_domain' => '',
     'cookie_pwd' => 'oSEx@uuw!ppr',
+    'lang_on' => 1,
+    'lang_default' => 'zh-cn',
     'debug' => false,
     'dev' => false,
     'version' => '1.0',

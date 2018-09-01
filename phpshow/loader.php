@@ -50,7 +50,8 @@ Class show{
     public $memory = 0;
     //框架配置文件
     public $config = array();
-
+    //语言
+    public $lang = array();
     public $ct = 'index';
     public $ac = 'index';
     public $bindings = array();
@@ -138,7 +139,15 @@ Class show{
         $this->config['db'] = include PS_CONFIG_PATH.DIRECTORY_SEPARATOR.'database.php';
         $this->config['site'] = include PS_CONFIG_PATH.DIRECTORY_SEPARATOR.'site.php';
         $this->config['route_rule'] = include PS_CONFIG_PATH.DIRECTORY_SEPARATOR.'route_rule.php';
-        //other?
+        if($this->config['site']['lang_on'] == '1')
+        {
+            $lang = $this->config['site']['lang_default'];
+            $lang_file = PS_CONFIG_PATH.DIRECTORY_SEPARATOR.'lang'.DIRECTORY_SEPARATOR.$lang.'.php';
+            if(file_exists($lang_file))
+            {
+                $this->lang = include $lang_file;
+            }
+        }
     }
 
     /**
