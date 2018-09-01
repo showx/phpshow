@@ -9,7 +9,7 @@ use \helper\util as util;
 //错误等级定义
 error_reporting( E_ALL );
 defined("PS_DEBUG") or define("PS_DEUBG","1");
-defined("PS_ISAJAX") or define("PS_ISAJAX",false);
+defined("PS_ISAJAX") or define("PS_ISAJAX","0");
 define("PS_PATH",dirname(__FILE__));
 define("PS_CONFIG_PATH",PS_PATH."/config/");
 define("PS_HELPER_PATH",PS_PATH."/helper/");
@@ -210,8 +210,6 @@ Class show{
                 $this->ac = $route_val['1'];
             }
         }
-
-
         $this->ct = preg_replace('/([^0-9a-z_])+/is','',$this->ct);
         $this->ac = preg_replace('/([^0-9a-z_])+/is','',$this->ac);
     }
@@ -233,9 +231,12 @@ Class show{
         $endtime = microtime(true);
         $usetime = $endtime - $this->starttime;
         \phpshow\lib\debug::show_debug_error();
-        $cx_string =  lr."使用内存:".util::bunit_convert($memory - $this->memory);
+        $cx_string =  lr."使用内存:".util::bunit_convert($memory - $this->memory).lr;
         $cx_string .= lr."使用时间:".sprintf('%.2f',$usetime)." sec";
-//        echo $cx_string;
+        if($this->config['site']['dev'] == 1 && PS_ISAJAX=='0')
+        {
+            lookdata($cx_string);
+        }
     }
     /**
      * 增加别名
@@ -302,7 +303,10 @@ Class show{
             }
         }catch(\Throwable $e)
         {
-//            var_dump($e);
+            if($this->config['site']['dev'] == '1')
+            {
+                lookdata($e);
+            }
             //这种异常写日志
         }
 

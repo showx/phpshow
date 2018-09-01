@@ -173,46 +173,28 @@ Class debug
      */
     public static function show_debug_error()
     {
+
+        if(\phpshow\App::$master->config['site']['debug'] == 0)
+        {
+            return '';
+        }
         if( self::$_debug_error_msg != '' )
         {
-            if( 1 )
-            {
-                $js  = '<script language=\'javascript\'>';
-                $js .= 'function debug_close_all() {';
-                $js .= '    document.getElementById(\'debug_ctl\').style.display=\'none\';';
-                $js .= '    document.getElementById(\'debug_errdiv\').style.display=\'none\';';
-                $js .= '}</script>';
-                echo $js;
-                echo '<div id="debug_ctl" style="width:100px;line-height:24px;position:absolute;top:5px;left:800px;border:1px solid #ccc; background: #FBFDE3; padding:2px;text-align:center">'."\n";
-                echo '<a href="#" target="_self" onclick="javascript:document.getElementById(\'debug_errdiv\').style.display=\'block\';" style="font-size:12px;">[打开调试信息]</a>'."\n";
-                echo '</div>'."\n";
-                echo '<div id="debug_errdiv" style="width:80%;position:absolute;top:10px;left:8px;border:2px solid #ccc; background: #fff; padding:8px;display:none">';
-                echo '<div style="line-height:24px; background: #FBFEEF;;"><div style="float:left"><strong>PHPSHOW框架应用错误/警告信息追踪：</strong></div><div style="float:right"><a href="#" onclick="javascript:debug_close_all();" target="_self">[关闭全部]</a></div>';
-                echo '<br style="clear:both"/></div>';
-                echo self::$_debug_error_msg;
-                echo '<br style="clear:both"/></div>';
-            }
-            else
-            {
-                //日志只保留当天的, 以免写程序不严谨造成太多错误日志没用时清理
-                $data_name = date("Ymd", time());
-                $data_name_old = date("Ymd", time() - 86400);
-                $error_log =   dirname(__FILE__).'/runtime/log/php_error'.$data_name.'.log';
-                $fname_old =   dirname(__FILE__).'/runtime/log/php_error'.$data_name_old.'.log';
+            $js  = '<script language=\'javascript\'>';
+            $js .= 'function debug_close_all() {';
+            $js .= '    document.getElementById(\'debug_ctl\').style.display=\'none\';';
+            $js .= '    document.getElementById(\'debug_errdiv\').style.display=\'none\';';
+            $js .= '}</script>';
+            echo $js;
+            echo '<div id="debug_ctl" style="width:100px;line-height:24px;position:absolute;top:5px;left:800px;border:1px solid #ccc; background: #FBFDE3; padding:2px;text-align:center">'."\n";
+            echo '<a href="#" target="_self" onclick="javascript:document.getElementById(\'debug_errdiv\').style.display=\'block\';" style="font-size:12px;">[打开调试信息]</a>'."\n";
+            echo '</div>'."\n";
+            echo '<div id="debug_errdiv" style="width:80%;position:absolute;top:10px;left:8px;border:2px solid #ccc; background: #fff; padding:8px;display:none">';
+            echo '<div style="line-height:24px; background: #FBFEEF;;"><div style="float:left"><strong>PHPSHOW框架应用错误/警告信息追踪：</strong></div><div style="float:right"><a href="#" onclick="javascript:debug_close_all();" target="_self">[关闭全部]</a></div>';
+            echo '<br style="clear:both"/></div>';
+            echo self::$_debug_error_msg;
+            echo '<br style="clear:both"/></div>';
 
-                $logmsg = preg_replace("/<font([^>]*)>|<\/font>|<\/div>|<\/strong>|<strong>|<br \/>/iU", '', self::$_debug_error_msg);
-                $logmsg = preg_replace("/<div style='font-size:14px([^>]*)>/iU", "-----------------------------------------------\n错误跟踪：", $logmsg);
-
-                //写入日志
-                $fp = fopen($error_log, 'a');
-                fwrite($fp, $logmsg);
-                fclose($fp);
-
-                //删除前一天日志
-                if( file_exists($fname_old) ) {
-                    unlink( $fname_old );
-                }
-            }
         }
     }
 

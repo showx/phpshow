@@ -33,7 +33,7 @@ function dumpall()
  */
 function lookdata($data)
 {
-    echo '<div style="background-color:#000000;color:#ffffff;width:100px;height:50px;position: relative;overflow: scroll;">';
+    echo '<div style="background-color:#000000;color:#ffffff;width:500px;height:200px;position: relative;overflow: scroll;">';
     echo var_export($data,true);
     echo '</div>';
 }
