@@ -9,23 +9,21 @@
 
 namespace phpshow;
 
-
+use phpshow\helper\facade\db;
 class model
 {
     //表格名
     public static $table_name = "";
     //条数
-    public $limit;
-
-    static function db(){
-        return \phpshow\helper\facade\db;
-    }
-
+    public static $limit = 25;
+    //页数
+    public static $page = 1;
+    public static $primary_key = 'id';
     /**
      * 数据库名
      * @return string
      */
-    static function table(){
+    public static function table(){
         if(static::$table_name === ""){
             $table_name = get_called_class();
             preg_match('#mod_[a-z]+#iu',$table_name,$table);
@@ -39,11 +37,11 @@ class model
      * 获取一条数据
      * @return mixed
      */
-    public function get_one()
+    public static function get_one()
     {
         $table = self::table();
-        $sql = "select * from $table order by id";
-        $rows = \db::get_one($sql);
+        $sql = "select * from `{$table}` ";
+        $rows = db::get_one($sql);
         return $rows;
     }
 
@@ -51,11 +49,14 @@ class model
      * 获取所有数据
      * @return mixed
      */
-    public function get_all()
+    public static function get_all($sql = '')
     {
         $table = self::table();
-        $sql = "select * from $table order by id";
-        $rows = \db::find($sql);
+        if(empty($sql))
+        {
+            $sql = "select * from `{$table}` ";
+        }
+        $rows = db::get_all($sql);
         return $rows;
 
     }
@@ -67,32 +68,66 @@ class model
      * @param string $where
      * @param string $order
      */
-    static function paginate($page, $size, $where='', $order=''){
-
+    public static function page_data($page, $where='')
+    {
+        $table = self::table();
+        $limit = self::$limit;
+        $offset = $limit * ($page - 1);
+        $sql = "select * from `{$table}` limit {$offset},{$limit} ";
+        $rows = self::get_all($sql);
+        return $rows;
     }
 
     /**
      * 插入新数据
      * @param $attrs
      */
-    static function save($attrs){
-
+    public static function save($attrs)
+    {
+        if(!is_array($attrs))
+        {
+            return false;
+        }
+        $table = self::table();
+        $arr_key = array_keys($attrs);
+        $arr_value = array_values($attrs);
+        $keyss = implode('`',$arr_key);
+        $valuess = implode("'",$arr_value);
+        $sql = "insert into `{$table}`(`{$keyss}`) values('{$valuess}') ";
+        db::query($sql);
+        return db::insert_id();
     }
 
     /**
      * 更新数据
      * @param $attrs
      */
-    function update($attrs){
-
+    public static function update($attrs,$where){
+        if(!is_array($attrs) && empty($where))
+        {
+            return false;
+        }
+        $table = self::table();
+        $update_arr = [];
+        foreach($attrs as $key=>$val)
+        {
+            $update_arr[] = " `{$key}`='{$val}' ";
+        }
+        $update_string = implode(',',$update_arr);
+        $sql = "update `{$table}` set {$update_string} where {$where} ";
+        db::query($sql);
     }
 
     /**
      * 删除数据
      * @param $id
      */
-    static function delete($id){
-
+    public static function delete($id){
+        $table = self::table();
+        $field = self::$primary_key;
+        $sql = "delete  from `{$table}` where `{$field}`='{$id}' ";
+        $rows = db::query($sql);
+        return $rows;
     }
 
 }

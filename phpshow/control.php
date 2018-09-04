@@ -17,7 +17,11 @@ class control
     public function __construct()
     {
         $this->is_ajax = $this->is_ajax();
-        self::_Acl();
+        if(!self::_Acl())
+        {
+            die('no access');
+        }
+
     }
 
     /**
@@ -25,7 +29,7 @@ class control
      */
     public function _Acl()
     {
-
+        return true;
     }
 
     /**
@@ -34,6 +38,7 @@ class control
      */
     public function is_ajax()
     {
+        defined("PS_ISAJAX") or define("PS_ISAJAX","0");
         if(PS_ISAJAX) return true;
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtoupper($_SERVER['HTTP_X_REQUESTED_WITH'])=='XMLHTTPREQUEST';
     }

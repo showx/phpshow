@@ -14,4 +14,5 @@ trait file{
     {
         file_put_contents($this->file_path,$data);
     }
+
 }

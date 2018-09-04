@@ -9,7 +9,7 @@ use \helper\util as util;
 //错误等级定义
 error_reporting( E_ALL );
 defined("PS_DEBUG") or define("PS_DEUBG","1");
-defined("PS_ISAJAX") or define("PS_ISAJAX","0");
+
 define("PS_PATH",dirname(__FILE__));
 define("PS_CONFIG_PATH",PS_PATH."/config/");
 define("PS_HELPER_PATH",PS_PATH."/helper/");
@@ -236,10 +236,15 @@ Class show{
         $usetime = $endtime - $this->starttime;
         \phpshow\lib\debug::show_debug_error();
         $cx_string =  lr."使用内存:".util::bunit_convert($memory - $this->memory).lr;
-        $cx_string .= lr."使用时间:".sprintf('%.2f',$usetime)." sec";
-        if($this->config['site']['dev'] == 1 && PS_ISAJAX=='0')
+        $cx_string .= lr."使用时间:".sprintf('%.2f',$usetime)." sec".lr;
+        if($this->config['site']['dev2'] == 1 && PS_ISAJAX=='0')
         {
-            lookdata($cx_string);
+            if(run_mode=='1')
+            {
+                lookdata($cx_string);
+            }else{
+                echo $cx_string;
+            }
         }
     }
     /**
@@ -262,6 +267,7 @@ Class show{
             'model' => 'phpshow\model',
             'request' => 'phpshow\request',
             'response' => 'phpshow\response',
+            'App' => 'phpshow\App',
         ];
         if(run_mode =='1')
         {
@@ -291,6 +297,11 @@ Class show{
      * @return mixed
      */
     public function make($abstract,$parameters=[]){
+
+        if(!isset($this->bindings[$abstract]))
+        {
+            return false;
+        }
         return call_user_func_array($this->bindings[$abstract],$parameters);
     }
 

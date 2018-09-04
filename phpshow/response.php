@@ -76,26 +76,27 @@ class response
      * @return string
      * @throws Exception
      */
-    public static function clicolor($text, $status)
+    public static function clicolor($text, $status='1')
     {
-        $out = "";
+        //1 SUCCESS  2 FAILURE  3 WARNING 4 NOTE
         switch($status) {
-            case "SUCCESS":
+            case "1":
                 $out = "[42m"; //Green background
                 break;
-            case "FAILURE":
+            case "2":
                 $out = "[41m"; //Red background
                 break;
-            case "WARNING":
+            case "3":
                 $out = "[43m"; //Yellow background
                 break;
-            case "NOTE":
+            case "4":
                 $out = "[44m"; //Blue background
                 break;
             default:
-                throw new Exception("Invalid status: " . $status);
+                $out = "";
+                break;
         }
-        return chr(27) . "$out" . "$text" . chr(27) . "[0m";
+        echo chr(27) . "$out" . "$text" . chr(27) . "[0m";
     }
 
     //----------------------------------------------------------

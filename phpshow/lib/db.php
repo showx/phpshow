@@ -16,20 +16,31 @@ class db
     public $link;
     //慢查询时间
     private $late_time = 3;
-    public function __construct()
+    public function __construct($conn = 'master')
     {
-        $this->connect();
+        $this->connect($conn);
     }
 
     /**
      * 连接数据库
      */
-    public function connect()
+    public function connect($conn = '')
     {
-        $config = \phpshow\App::getConfig("db")['mysql']['master'];
+        if(empty($conn))
+        {
+            $conn = "master";
+        }
+        $config = \App::getConfig("db")['mysql'][$conn];
         $this->conn = mysqli_connect($config['host'],$config['username'],$config['password'],$config['dbname'],$config['port']) or die('mysql connect error');
 //        mysqli_select_db($this->conn,$config['dbname']);
 //        $this->query(" use `{$dbname}`; ");
+        if(empty($config['charset']))
+        {
+            $charset = 'utf-8';
+        }else{
+            $charset = $config['charset'];
+        }
+        mysqli_set_charset($this->conn,$charset);
         return $this->conn;
     }
 
@@ -134,6 +145,19 @@ class db
     }
 
     /**
+     * 处理大数组
+     * @param $sql
+     * @return \Generator
+     */
+    public function get_big_all($sql)
+    {
+        $result = $this->query($sql);
+        while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)) {
+            yield $row;
+        }
+    }
+
+    /**
      * 获取插入的id
      * @return int|string
      */
@@ -141,4 +165,40 @@ class db
     {
         return mysqli_insert_id($this->conn);
     }
+
+    /**
+     * 预处理方式处理
+     * @param $query
+     * @param array $args
+     * @return array|bool|\mysqli_result
+     */
+    public function prepare_query($query, array $args = [])
+    {
+        $result = false;
+        $stmt = mysqli_stmt_init($this->conn);
+        if(mysqli_stmt_prepare($stmt,$query))
+        {
+            $params = [];
+            $types  = array_reduce($args, function ($string, &$arg) use (&$params) {
+                $params[] = &$arg;
+                if (is_float($arg))         $string .= 'd';
+                elseif (is_integer($arg))   $string .= 'i';
+                elseif (is_string($arg))    $string .= 's';
+                else                        $string .= 'b';
+                return $string;
+            }, '');
+            if($params && $types)
+            {
+                mysqli_stmt_bind_param($stmt,$types,...$params);
+            }
+            $execute = mysqli_stmt_execute($stmt);
+            if($execute)
+            {
+                $result = mysqli_stmt_get_result($stmt);
+            }
+            mysqli_stmt_close($stmt);
+        }
+        return $result;
+    }
+
 }

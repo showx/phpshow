@@ -13,13 +13,13 @@ return [
             'password' => 'root',
         ],
     ],
-    'postgresql' => [
-        'host' => '127.0.0.1',
-        'port' => '5432',
-        'dbname' => 'show',
-        'username' => 'postgres',
-        'password' => 'postgres',
-    ],
+//    'postgresql' => [
+//        'host' => '127.0.0.1',
+//        'port' => '5432',
+//        'dbname' => 'show',
+//        'username' => 'postgres',
+//        'password' => 'postgres',
+//    ],
     'redis' => [
         'host' => '127.0.0.1',
         'port' => '6379',
