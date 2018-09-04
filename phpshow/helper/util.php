@@ -6,9 +6,10 @@
  * Date: 2018/7/19
  * Time: 上午9:37
  */
-namespace helper;
+namespace phpshow\helper;
 class util
 {
+    public static $client_ip;
     /**
      * 获得用户的真实IP 地址
      *
@@ -101,7 +102,7 @@ class util
      * utf-8中文截取，按字数截取模式
      * @return string
      */
-    function utf8_substr_num($str, $length, $start=0)
+    public static function utf8_substr_num($str, $length, $start=0)
     {
         preg_match_all('/./su', $str, $ar);
         if( count($ar[0]) <= $length ) {
@@ -131,11 +132,13 @@ class util
      * @param $size
      * @return string
      */
-    public function bunit_convert($size)
+    public static function bunit_convert($size)
     {
         $unit=array('b','kb','mb','gb','tb','pb');
         return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
     }
+
+
 
 
 }

@@ -4,7 +4,6 @@
  * Author:show
  */
 namespace phpshow;
-use \helper\util as util;
 
 //错误等级定义
 error_reporting( E_ALL );
@@ -235,7 +234,7 @@ Class show{
         $endtime = microtime(true);
         $usetime = $endtime - $this->starttime;
         \phpshow\lib\debug::show_debug_error();
-        $cx_string =  lr."使用内存:".util::bunit_convert($memory - $this->memory).lr;
+        $cx_string =  lr."使用内存:".\util::bunit_convert($memory - $this->memory).lr;
         $cx_string .= lr."使用时间:".sprintf('%.2f',$usetime)." sec".lr;
         if($this->config['site']['dev2'] == 1 && PS_ISAJAX=='0')
         {
@@ -254,6 +253,7 @@ Class show{
     public function addClassAlias(Array $result_me = [])
     {
         $result = [
+            'util' => 'phpshow\helper\util',
             'log' => 'phpshow\lib\log',
             'acl' => 'phpshow\lib\acl',
             'api' => 'phpshow\lib\api',
@@ -272,6 +272,7 @@ Class show{
         if(run_mode =='1')
         {
             $result['session'] = 'phpshow\lib\session';
+            //启用session
         }
         if(!empty($result_me))
         {
@@ -280,6 +281,10 @@ Class show{
         foreach($result as $key=>$val)
         {
             class_alias($val, '\\'.$key);
+        }
+        if(run_mode=='1')
+        {
+            session_start();
         }
     }
     /**

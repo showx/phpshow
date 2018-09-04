@@ -13,7 +13,7 @@ namespace phpshow\lib;
 //接口参数
 ini_set('session.gc_divisor', 1000);
 ini_set('session.gc_probability', 1000);
-session_write_close();
+//session_write_close();
 session_set_save_handler(
     "\phpshow\lib\session::init",
     "\phpshow\lib\session::close",
@@ -23,7 +23,7 @@ session_set_save_handler(
     "\phpshow\lib\session::gc"
 );
 session_save_path( PS_RUNTIME.'/session' );
-
+//echo 'session start';
 
 /**
  * session接口类
@@ -59,7 +59,6 @@ class session
         self::$session_name = $cookie_name;
         self::$session_path = $save_path;
         self::$session_id   = session_id();
-        self::$session_type = SESSION_TYPE;
         self::$session_live_time = empty(self::$session_live_time) ? ini_get('session.gc_maxlifetime') : self::$session_live_time;
         return true;
     }

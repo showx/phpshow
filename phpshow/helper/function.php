@@ -37,7 +37,46 @@ function lookdata($data)
     echo var_export($data,true);
     echo '</div>';
 }
+/**
+ * set cookie
+ */
+function sCookie($key,$value)
+{
+    if(empty($key))
+    {
+        return false;
+    }
+    $site = \App::getConfig("site");
+    $expire = 1800;
+    $_COOKIE[$key] = $value;
+    return setcookie($key,$value,time() + $expire,'',$site['cookie_domain']);
+}
 
+/**
+ * 获取cookie
+ * @param $key
+ * @return mixed
+ */
+function gCookie($key)
+{
+    if(isset($_COOKIE[$key]))
+    {
+        return $_COOKIE[$key];
+    }else{
+        return '';
+    }
+
+}
+
+/**
+ * 删除cookie
+ * @param $key
+ * @return bool
+ */
+function dCookie($key)
+{
+    return setcookie($key,'');
+}
 //--------tpl相关---------
 function tpl_file($file_name)
 {
