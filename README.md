@@ -43,6 +43,9 @@ server中增加$request_file的判断
 # 框架教程
 ### 框架架构
 
+![avatar](readme.png)
+
+
 简单的mvc模式，入口在/public文件夹，主要逻辑在于/app文件夹中。
 
 ### 路由
@@ -78,3 +81,5 @@ dCookie 清除cookie
 <li> 设置缓存 \App::set($key,$value);</li>
 <li> 获取缓存 \App::get($key); </li>
 
+## 留言本
+联系本人 9448923#qq.com
