@@ -14,8 +14,8 @@ class log
 {
     //默认使用seaslog作为写入日志
     public $type = 2;
-    public $log_type = array("debug","info","NOTICE");
-
+    public $log_type = array("debug"=>1,"info"=>2,"notice"=>3,"error"=>4,"critical"=>5,"emergency"=>6);
+    private $path = '';
     public function __construct()
     {
         if (!extension_loaded('seaslog'))
@@ -24,12 +24,22 @@ class log
         }else{
             $this->type = 2;
         }
+        $this->setLogPath(PS_RUNTIME.'/log/');
     }
     public function _action($data,$type='info')
     {
+        if(!isset($this->log_type[strtolower($type)]))
+        {
+            return false;
+        }
         if($this->type==2)
         {
             call_user_func_array("\SeasLog::{$type}",array($data));
+        }else{
+            $date = date("YmdH");
+            $time = time();
+            $log = "[{$type}]".$data." time:{$time}\n";
+            file_put_contents($this->path.'/'.$date.'.log',$log,FILE_APPEND|LOCK_EX);
         }
     }
     public function log($data,$type='')
@@ -71,9 +81,23 @@ class log
     /**
      * 设置日志地址
      */
-    public function setLogPath()
+    public function setLogPath($path = '')
     {
+        if($this->type=='2')
+        {
+            \SeasLog::setBasePath($path);
+        }else{
+            $this->path = $path;
+        }
+    }
 
+    /**
+     * 创建文件夹
+     * @return bool
+     */
+    public function dir_make()
+    {
+        return true;
     }
 
 }
