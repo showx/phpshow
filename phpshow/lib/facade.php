@@ -12,7 +12,7 @@ namespace phpshow\lib;
 
 class facade
 {
-    public static $facade_obj = null;
+    public static $facade_obj = [];
 
     /**
      * 获取句柄
@@ -21,11 +21,12 @@ class facade
      * @return mixed
      */
     public static function getInstance($classname,$args){
-        if(self::$facade_obj == null)
+        $name = basename($classname);
+        if(!isset(self::$facade_obj[$name]))
         {
-            self::$facade_obj = new $classname($args);
+            self::$facade_obj[$name] = new $classname($args);
         }
-        return self::$facade_obj;
+        return self::$facade_obj[$name];
     }
 
     /**
@@ -38,6 +39,12 @@ class facade
         return $classname;
     }
 
+    /**
+     * 回调静态方法
+     * @param $method
+     * @param $arg
+     * @return mixed
+     */
     public static function __callstatic($method,$arg){
         $instance=static::getInstance(static::getFacadeAccessor(),[]);
         return call_user_func_array(array($instance,$method),$arg);
