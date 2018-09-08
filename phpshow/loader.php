@@ -126,8 +126,11 @@ Class show{
             if(array_key_exists($filename_sub,$this->autoloader))
             {
                 $filepath = PS_APP_PATH.$this->autoloader[$filename_sub].$filename;
-                require_once $filepath;
-                return true;
+                if(file_exists($filepath))
+                {
+                    require_once $filepath;
+                    return true;
+                }
             }
         }
         return false;

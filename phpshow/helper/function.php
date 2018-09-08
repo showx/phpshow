@@ -10,7 +10,7 @@
  * 方便输出数据
  * @param $data
  */
-function dump($data)
+function dump(...$data)
 {
     echo '<pre>';
     var_dump($data);
