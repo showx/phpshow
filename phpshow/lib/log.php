@@ -16,7 +16,7 @@ class log
     public $type = 2;
     public $log_type = array("debug"=>1,"info"=>2,"notice"=>3,"error"=>4,"critical"=>5,"emergency"=>6);
     private $path = '';
-    public function __construct()
+    public function __construct($default_dir='')
     {
         if (!extension_loaded('seaslog'))
         {
@@ -25,6 +25,11 @@ class log
             $this->type = 2;
         }
         $this->setLogPath(PS_RUNTIME.'/log/');
+        if(empty($default_dir))
+        {
+            $default_dir = date("Ymd");
+        }
+        $this->setLogDirName($default_dir);
     }
     public function _action($data,$type='info')
     {
@@ -88,6 +93,25 @@ class log
             \SeasLog::setBasePath($path);
         }else{
             $this->path = $path;
+        }
+    }
+
+    /**
+     * 设置日志规则
+     * @param string $name
+     * @return string
+     */
+    public function setLogDirName($name = '')
+    {
+        if(empty($name))
+        {
+            return '';
+        }
+        if($this->type=='2')
+        {
+            \SeasLog::setLogger($name);
+        }else{
+            $this->path."/".$name."/";
         }
     }
 
