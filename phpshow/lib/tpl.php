@@ -56,7 +56,12 @@ class tpl
         }
         $result = self::$tpl_result;
         $closure = function($file_name) use($result){
+//            foreach($result as $kk=>$vv)
+//            {
+//                $this->{$kk} = $vv;
+//            }
             $this->result = $result;
+            extract($result);
             ob_start();
             include self::include_file($file_name);
             return ob_end_flush();

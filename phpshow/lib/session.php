@@ -70,7 +70,14 @@ class session
      */
     public static function read( $id )
     {
-        return (string)@file_get_contents(self::$session_path."/sess_$id");
+        $file = self::$session_path."/sess_{$id}";
+        if(file_exists($file))
+        {
+            $tmp = (string)@file_get_contents($file);
+            return $tmp;
+        }else{
+            return "";
+        }
     }
 
     /**
