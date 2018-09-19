@@ -317,6 +317,14 @@ Class show{
     {
         try{
             $ctl  = 'app\control\ctl_'.$this->ct;
+            //强制运行在cli下的规则
+            if(substr($this->ct,0,7)=='command' || substr($this->ac,0,7)=='command' )
+            {
+                if(run_mode!='2')
+                {
+                    die('run cli');
+                }
+            }
             if( method_exists ( $ctl, $this->ac ) === true )
             {
                 $instance = new $ctl;
