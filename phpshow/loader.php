@@ -142,9 +142,12 @@ Class show{
      */
     public function config()
     {
-        $this->config['db'] = include PS_CONFIG_PATH.DIRECTORY_SEPARATOR.'database.php';
-        $this->config['site'] = include PS_CONFIG_PATH.DIRECTORY_SEPARATOR.'site.php';
-        $this->config['route_rule'] = include PS_CONFIG_PATH.DIRECTORY_SEPARATOR.'route_rule.php';
+
+        $config_arr = include PS_CONFIG_PATH.DIRECTORY_SEPARATOR.'include.php';
+        foreach($config_arr as $load_key => $load_config)
+        {
+            $this->config[$load_key] = include PS_CONFIG_PATH.DIRECTORY_SEPARATOR.$load_config.'.php';
+        }
         if($this->config['site']['lang_on'] == '1')
         {
             $lang = $this->config['site']['lang_default'];
@@ -176,7 +179,7 @@ Class show{
     {
         $this->config();
 
-        $route_rule = $this->config['route_rule'];
+        $route_rule = $this->config['route'];
 
         //也可以获取路由规则的
         //读取获取到的参数,ct,ac只能根据url来
