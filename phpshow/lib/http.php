@@ -81,18 +81,18 @@ class http
         if( function_exists('curl_init') )
         {
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $query_str);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_USERAGENT, self::$user_agent );
-            if(type=='json')
+            if($type=='json')
             {
                 curl_setopt($ch, CURLOPT_HTTPHEADER, [
                     'Content-Type: application/json; charset=utf-8',
                 ]);
             }
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $query_str);
             $result = curl_exec($ch);
 //            $errno  = curl_errno($ch);
             curl_close($ch);
