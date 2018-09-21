@@ -67,13 +67,17 @@ class http
      * 向指定网址发送post请求
      * @parem $url
      * @parem $query_str
-     * @parem $$timeout=30
-     * @parem $referer_url=''
+     * @parem $type=''
+     * @parem $$timeout=5
      * @return string
      */
-    public static function post($url, $query_str, $timeout=30, $referer_url='')
+    public static function post($url, $query_str, $type='',$timeout=5)
     {
         $startt = time();
+        if(is_array($query_str))
+        {
+            $query_str = http_build_query($url);
+        }
         if( function_exists('curl_init') )
         {
             $ch = curl_init();
@@ -83,8 +87,14 @@ class http
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_USERAGENT, self::$user_agent );
+            if(type=='json')
+            {
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                    'Content-Type: application/json; charset=utf-8',
+                ]);
+            }
             $result = curl_exec($ch);
-            $errno  = curl_errno($ch);
+//            $errno  = curl_errno($ch);
             curl_close($ch);
             //echo " $url & $query_str <hr /> $errno , $result ";
             return $result;

@@ -319,7 +319,7 @@ Class show{
     public function run()
     {
         try{
-            $ctl  = 'app\control\ctl_'.$this->ct;
+            $ctl  = PS_APP_NAME.'\control\ctl_'.$this->ct;
             //强制运行在cli下的规则
             if(substr($this->ct,0,7)=='command' || substr($this->ac,0,7)=='command' )
             {
