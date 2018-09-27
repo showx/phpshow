@@ -352,17 +352,26 @@ Class show{
 Class App{
 
     public static $master;
-    public $result = array();
+    public static $result = array();
     public static function start($argc='',$argv='')
     {
         self::$master = new show();
         self::$master->addClassAlias();
         if(run_mode=='2')
         {
-            if($argc>1)
+            request::$forms['argc'] = $argc;
+            request::$forms['argv'] = $argv;
+            if($argc>0)
             {
                 request::$forms["ct"] = $argv['1'];
-                request::$forms["ac"] = $argv['2'];
+                if(isset($argv['2']))
+                {
+                    request::$forms["ac"] = $argv['2'];
+                }
+                if(isset($argv['3']))
+                {
+                    request::$forms["command"] = $argv['3'];
+                }
             }
         }
         self::$master->miniroute();
