@@ -20,16 +20,34 @@ class psredis
         {
             $redis = new \Redis();
             //config文件夹读取 不连接会出现Redis server went away
-            $redis->connect('127.0.0.1', 6379);
+            $config = \App::getConfig("db")['redis'];
+            $redis->connect($config['host'], $config['port']);
+            if(!empty($config['auth']))
+            {
+                $redis->auth($config['auth']);
+            }
             self::$hand_ob = $redis;
         }
     }
 
+    /**
+     * 静态调用方法
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
     public static function __callStatic($name, $arguments)
     {
         self::handle();
         return self::$hand_ob->$name(implode(",",$arguments));
     }
+
+    /**
+     * 调用方法
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
     public function __call($name, $arguments)
     {
         self::handle();

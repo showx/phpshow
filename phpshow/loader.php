@@ -359,6 +359,8 @@ Class App{
         self::$master->addClassAlias();
         if(run_mode=='2')
         {
+            //$this->argv = $_SERVER['argv'];
+            //$this->argc = $_SERVER['argc'];
             request::$forms['argc'] = $argc;
             request::$forms['argv'] = $argv;
             if($argc>0)
