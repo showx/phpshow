@@ -38,12 +38,36 @@ class response
      */
     public static function json($code='0',$msg='',$data='')
     {
+        $result = self::returnArray($code,$msg,$data);
+        echo json_encode($result);
+    }
+
+    /**
+     * 返回json
+     * @param string $code
+     * @param string $msg
+     * @param string $data
+     */
+    public static function returnjson($code='0',$msg='',$data='')
+    {
+        $result = self::returnArray($code,$msg,$data);
+        return json_encode($result);
+    }
+
+    /**
+     * 返回array
+     * @param string $code
+     * @param string $msg
+     * @param string $data
+     */
+    public static function returnArray($code='0',$msg='',$data='')
+    {
         $result = array(
             'code' => $code,
             'message' => $msg,
             'data' => $data,
         );
-        echo json_encode($result);
+        return $result;
     }
 
     /**
