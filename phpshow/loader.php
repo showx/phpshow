@@ -51,6 +51,7 @@ Class show{
     public $config = array();
     //语言
     public $lang = array();
+    public $module = "";
     public $ct = 'index';
     public $ac = 'index';
     public $bindings = array();
@@ -125,10 +126,18 @@ Class show{
         {
             if(array_key_exists($filename_sub,$this->autoloader))
             {
-                $filepath = PS_APP_PATH.$this->autoloader[$filename_sub].$filename;
-                if(file_exists($filepath))
+                $filePath = PS_APP_PATH.$this->autoloader[$filename_sub].$filename;
+                if(!empty($this->module))
                 {
-                    require_once $filepath;
+                    $fileModulePath = PS_APP_PATH.DIRECTORY_SEPARATOR.$this->module.$this->autoloader[$filename_sub].$filename;
+                    if(file_exists($fileModulePath))
+                    {
+                        require_once $fileModulePath;
+                    }
+                }
+                if(file_exists($filePath))
+                {
+                    require_once $filePath;
                     return true;
                 }
             }
@@ -178,9 +187,7 @@ Class show{
     public function miniroute()
     {
         $this->config();
-
         $route_rule = $this->config['route'];
-
         //也可以获取路由规则的
         //读取获取到的参数,ct,ac只能根据url来
         $this->ct = !empty(request::item("ct"))?request::item("ct"):$this->ct;
@@ -190,7 +197,24 @@ Class show{
             //QUERY_STRING 参数为s
             $path = request::item("s");
             $path = explode("/",$path);
-            $exits = ['ct','ac'];
+            $realpath = array();
+            foreach($path as $key=>$val)
+            {
+                if(!empty($val))
+                {
+                    $realpath[] = $val;
+                }
+            }
+            $path = $realpath;
+            $exist1 = ['ct','ac'];
+            $exist2 = ['module','ct','ac'];
+            $pathcount = count($path);
+            if($pathcount>2)
+            {
+                $exist = $exist2;
+            }else{
+                $exist = $exist1;
+            }
             $i = 0;
             foreach($path as $key=>$val)
             {
@@ -198,11 +222,11 @@ Class show{
                 {
                     if($i == 0)
                     {
-                        $tmp = current($exits);
+                        $tmp = current($exist);
                         $this->$tmp = $val;
                         $i = 1;
                     }else{
-                        $tmp = next($exits);
+                        $tmp = next($exist);
                         $this->$tmp = $val;
                     }
                 }
@@ -219,6 +243,7 @@ Class show{
                 $this->ac = $route_val['1'];
             }
         }
+        $this->module = preg_replace('/([^0-9a-z_])+/is','',$this->module);
         $this->ct = preg_replace('/([^0-9a-z_])+/is','',$this->ct);
         $this->ac = preg_replace('/([^0-9a-z_])+/is','',$this->ac);
     }
@@ -319,7 +344,12 @@ Class show{
     public function run()
     {
         try{
-            $ctl  = PS_APP_NAME.'\control\ctl_'.$this->ct;
+            if(!empty($this->module))
+            {
+                $ctl  = PS_APP_NAME."\\".$this->module.'\control\ctl_'.$this->ct;
+            }else{
+                $ctl  = PS_APP_NAME.$this->module.'\control\ctl_'.$this->ct;
+            }
             //强制运行在cli下的规则
             if(substr($this->ct,0,7)=='command' || substr($this->ac,0,7)=='command' )
             {

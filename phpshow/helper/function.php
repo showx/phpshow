@@ -34,7 +34,9 @@ function dumpall()
 function lookdata($data)
 {
     echo '<div style="background-color:#000000;color:#ffffff;width:500px;height:200px;position: relative;overflow: scroll;">';
+    echo "<pre>";
     echo var_export($data,true);
+    echo "</pre>";
     echo '</div>';
 }
 /**
