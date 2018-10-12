@@ -22,7 +22,9 @@ session_set_save_handler(
     "\phpshow\lib\session::destroy",
     "\phpshow\lib\session::gc"
 );
-session_save_path( PS_RUNTIME.'/session' );
+//$session_path = PS_RUNTIME;
+$session_path = "/tmp/";
+session_save_path( $session_path.'/session' );
 //echo 'session start';
 
 /**
@@ -100,6 +102,7 @@ class session
     {
         $file = self::$session_path."/sess_$id";
         if (file_exists($file)) {
+
             unlink($file);
         }
         return true;
@@ -112,6 +115,8 @@ class session
      */
     public static function gc($max_lifetime)
     {
+//        return true;
+        //需优化一下，使用crond来检查或改用单文件hash获取
         foreach (glob(self::$session_path."/sess_*") as $file) {
             if (filemtime($file) + $max_lifetime < time() && file_exists($file)) {
                 unlink($file);

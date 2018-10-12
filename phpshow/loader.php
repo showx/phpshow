@@ -313,10 +313,11 @@ Class show{
         {
             class_alias($val, '\\'.$key);
         }
-        if(run_mode=='1')
-        {
-            session_start();
-        }
+//        if(run_mode=='1')
+//        {
+            //用的时候才代码开启
+//            session_start();
+//        }
     }
     /**
      * 容器的绑定
@@ -393,6 +394,7 @@ Class App{
             //$this->argc = $_SERVER['argc'];
             request::$forms['argc'] = $argc;
             request::$forms['argv'] = $argv;
+            //可使用 module/ct/ac 这种请求方式
             if($argc>0)
             {
                 request::$forms["ct"] = $argv['1'];
