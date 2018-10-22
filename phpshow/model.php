@@ -19,6 +19,7 @@ class model
     //页数
     public static $page = 1;
     public static $primary_key = 'id';
+    //完成rest资源get post put delete
     /**
      * 数据库名
      * @return string

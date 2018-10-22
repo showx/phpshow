@@ -3,6 +3,7 @@
  * Created by PhpStorm.
  * User: pengyongsheng
  * @todo mysql主从
+ * @todo 增加列存储infobright
  * Date: 2018/7/19
  * Time: 下午7:29
  */

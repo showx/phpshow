@@ -69,7 +69,6 @@ function gCookie($key)
     }
 
 }
-
 /**
  * 删除cookie
  * @param $key
