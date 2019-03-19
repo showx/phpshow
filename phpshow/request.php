@@ -29,29 +29,73 @@ class request
     * 对于 post、get 的数据，会转到 selfforms 数组， 并删除原来数组
     * 对于 cookie 的数据，会转到 cookies 数组，但不删除原来数组
     */
-    public static function init()
+    public static function init($request = null)
     {
-        //命令行模式
-        if( empty($_SERVER['REQUEST_METHOD']) ) {
-            return false;
-        }
         $magic_quotes_gpc = ini_get('magic_quotes_gpc');
-        //处理post、get
-        self::$request_mdthod = '';
-        if( $_SERVER['REQUEST_METHOD']=='GET' ) {
-            self::$request_mdthod = 'GET';
-            $request_arr = $_GET;
-        } else {
-            self::$request_mdthod = $_SERVER['REQUEST_METHOD'];
-            $request_arr = $_REQUEST;
-        }
-        //POST里的变更覆盖$_REQUEST(即是表单名与cookie同名, 表单优先)
-        if($_SERVER['REQUEST_METHOD']=='POST') {
-            self::$request_mdthod = 'POST';
-            foreach( $_POST as $k => $v) {
-                $request_arr[$k] = $v;
+        $request_arr = [];
+        if($request)
+        {
+            if($request->cookie)
+            {
+                $_COOKIE = $request->cookie;
+            }
+            $_SERVER2 = $request->server;
+            if( empty($_SERVER2['request_method']) ) {
+                return false;
+            }
+
+            //处理post、get
+            self::$request_mdthod = '';
+            if( $_SERVER2['request_method']=='GET' ) {
+                self::$request_mdthod = 'GET';
+                $request_arr = $request->get;
+            } else {
+                self::$request_mdthod = $_SERVER2['request_method'];
+                if($request->request)
+                {
+                    $request_arr = $request->request;
+                }
+            }
+            //POST里的变更覆盖$_REQUEST(即是表单名与cookie同名, 表单优先)
+            if($_SERVER2['request_method']=='POST') {
+                self::$request_mdthod = 'POST';
+                foreach( $request->post as $k => $v) {
+                    $request_arr[$k] = $v;
+                }
+            }
+
+            if($_SERVER2['request_uri'])
+            {
+                $request_arr['s'] = $_SERVER2['request_uri'];
+            }
+
+        }else{
+            //命令行模式
+            if( empty($_SERVER['REQUEST_METHOD']) ) {
+                return false;
+            }
+
+            //处理post、get
+            self::$request_mdthod = '';
+            if( $_SERVER['REQUEST_METHOD']=='GET' ) {
+                self::$request_mdthod = 'GET';
+                $request_arr = $_GET;
+            } else {
+                self::$request_mdthod = $_SERVER['REQUEST_METHOD'];
+                $request_arr = $_REQUEST;
+            }
+            //POST里的变更覆盖$_REQUEST(即是表单名与cookie同名, 表单优先)
+            if($_SERVER['REQUEST_METHOD']=='POST') {
+                self::$request_mdthod = 'POST';
+                foreach( $_POST as $k => $v) {
+                    $request_arr[$k] = $v;
+                }
             }
         }
+//        var_dump(self::$request_mdthod);
+//        var_dump($request_arr);
+
+
         unset($_POST);
         unset($_GET);
         unset($_REQUEST);

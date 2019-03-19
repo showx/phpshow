@@ -138,7 +138,47 @@ class util
         return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
     }
 
+    /**
+     * 发送邮件
+     * @param $mail_to
+     * @param $mail_fromname
+     * @param $mail_from
+     * @param $mail_subject
+     * @param $mail_body
+     * @param $mail_type
+     * @return bool
+     */
+    public static function sendmail($mail_to, $mail_fromname, $mail_from, $mail_subject, $mail_body, $mail_type='')
+    {
+        require_once PATH_LIBRARY.'/PHPMailer/PHPMailerAutoload.php';
 
+        $mail = new PHPMailer;
+        $mail->SMTPDebug = 3;                               // Enable verbose debug output
+
+        $mail->isSMTP();                                      // Set mailer to use SMTP
+        $mail->Host = 'smtp.exmail.qq.com';  // Specify main and backup SMTP servers
+        $mail->SMTPAuth = true;                               // Enable SMTP authentication
+        $mail->Username = 'tiandi@luabuy.com';                 // SMTP username
+        $mail->Password = 'WWshow123';                           // SMTP password
+        $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
+        $mail->Port = 465;                                    // TCP port to connect to
+
+        $mail->setFrom($mail_from, $mail_fromname);
+        $mail->addAddress($mail_to, 'phpshow');     // Add a recipient
+
+        if($mail_type=='html')
+        {
+            $mail->isHTML(true);                                  // Set email format to HTML
+        }
+        $mail->Subject = $mail_subject;
+        $mail->Body    = $mail_body;
+
+        if(!$mail->send()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
 
 }

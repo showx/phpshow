@@ -52,7 +52,7 @@ class tpl
     {
         if(empty($file_name))
         {
-            $file_name = \phpshow\App::$master->ac;
+//            $file_name = \phpshow\App::$master->ac;
         }
         $result = self::$tpl_result;
         $closure = function($file_name) use($result){
@@ -64,7 +64,12 @@ class tpl
             extract($result);
             ob_start();
             include self::include_file($file_name);
-            return ob_end_flush();
+
+            $res = ob_get_contents();
+            ob_end_clean();
+            \response::end($res);
+
+//            return ob_end_flush();
 //            ob_get_clean();
         };
         $content = new class() {

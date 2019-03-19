@@ -18,6 +18,18 @@ function dump(...$data)
 }
 
 /**
+ * 解释出json转arr输出
+ * @param $data
+ */
+function dumpJson($data)
+{
+    $data = json_decode($data,true);
+    echo '<pre>';
+    var_dump($data);
+    echo '</pre>';
+}
+
+/**
  * 输出所有数据
  */
 function dumpall()

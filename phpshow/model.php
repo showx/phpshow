@@ -92,8 +92,8 @@ class model
         $table = self::table();
         $arr_key = array_keys($attrs);
         $arr_value = array_values($attrs);
-        $keyss = implode('`',$arr_key);
-        $valuess = implode("'",$arr_value);
+        $keyss = implode('`,`',$arr_key);
+        $valuess = implode("','",$arr_value);
         $sql = "insert into `{$table}`(`{$keyss}`) values('{$valuess}') ";
         db::query($sql);
         return db::insert_id();

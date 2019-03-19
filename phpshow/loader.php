@@ -64,13 +64,15 @@ Class show{
         require PS_PATH.'/composer/vendor/autoload.php';
         //默认必定的加载的类
         request::init();
-
         //发生异常的记录
         set_exception_handler(array('\phpshow\lib\debug','handler_debug_exception'));
-        //发生错误的记录
-        set_error_handler(array('\phpshow\lib\debug','handler_debug_error'), E_ALL);
-        //页面结束调用
-        register_shutdown_function(array($this, 'end'));
+        if(PHP_SAPI != 'cli')
+        {
+            //发生错误的记录
+            set_error_handler(array('\phpshow\lib\debug','handler_debug_error'), E_ALL);
+            //页面结束调用
+            register_shutdown_function(array($this, 'end'));
+        }
     }
 
     /**
@@ -133,6 +135,7 @@ Class show{
                     if(file_exists($fileModulePath))
                     {
                         require_once $fileModulePath;
+                        return true;
                     }
                 }
                 if(file_exists($filePath))
@@ -192,7 +195,7 @@ Class show{
         //读取获取到的参数,ct,ac只能根据url来
         $this->ct = !empty(request::item("ct"))?request::item("ct"):$this->ct;
         $this->ac = !empty(request::item("ac"))?request::item("ac"):$this->ac;
-        if(run_mode == '1')
+//        if(run_mode == '1')
         {
             //QUERY_STRING 参数为s
             $path = request::item("s");
@@ -283,6 +286,7 @@ Class show{
      */
     public function addClassAlias(Array $result_me = [])
     {
+//        echo "addClassAlias".lr;
         $result = [
             'util' => 'phpshow\helper\util',
             'log' => 'phpshow\lib\log',
@@ -345,6 +349,12 @@ Class show{
     public function run()
     {
         try{
+            if(!defined("PS_APP_NAME"))
+            {
+                //console取，默认使用App文件夹
+                define("PS_APP_NAME","app");
+                define("PS_APP_PATH",PS_PATH."/../".PS_APP_NAME);
+            }
             if(!empty($this->module))
             {
                 $ctl  = PS_APP_NAME."\\".$this->module.'\control\ctl_'.$this->ct;
@@ -359,11 +369,13 @@ Class show{
                     die('run cli');
                 }
             }
+
             if( method_exists ( $ctl, $this->ac ) === true )
             {
                 $instance = new $ctl;
                 $instance->{$this->ac}();
             } else {
+                \response::end("404");
                 throw new \Exception('fucking control..');
             }
         }catch(\Throwable $e)
@@ -388,15 +400,40 @@ Class App{
     {
         self::$master = new show();
         self::$master->addClassAlias();
+        $master = self::$master;
         if(run_mode=='2')
         {
-            //$this->argv = $_SERVER['argv'];
-            //$this->argc = $_SERVER['argc'];
             request::$forms['argc'] = $argc;
             request::$forms['argv'] = $argv;
             //可使用 module/ct/ac 这种请求方式
-            if($argc>0)
+            if($argc>1)
             {
+                if($argv['1'] == 'start')
+                {
+                    swoole_set_process_name("http");
+                    echo 'start http'.lr;
+                    $host = "0.0.0.0";  //* 127.0.0.1 phpshow.x7t.cn
+                    $http = new \Swoole\Http\Server($host, 8080);
+                    $http->set(array(
+                        'worker_num' => 3,
+                        'daemonize' => true,
+                    ));
+                    $http->on('request', function ($request, $response) use( $master ) {
+                        $uri = $request->server['request_uri'];
+                        if ($uri == '/favicon.ico') {
+                            $response->status(404);
+                            $response->end();
+                        }
+                        request::init($request);
+                        $master->miniroute();
+                        \response::setSw($response);
+                        $master->run();
+                    });
+                    $http->start();
+                    exit();
+                }
+
+
                 request::$forms["ct"] = $argv['1'];
                 if(isset($argv['2']))
                 {
@@ -406,13 +443,12 @@ Class App{
                 {
                     request::$forms["command"] = $argv['3'];
                 }
+
+
             }
+
         }
         self::$master->miniroute();
-        //初始化基本集合 关闭db初始化
-//        self::$master->bind('db',function(){
-//            return new \phpshow\lib\db();
-//        });
         self::$master->run();
     }
     public static function run()

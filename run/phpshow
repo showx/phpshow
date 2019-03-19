@@ -8,8 +8,8 @@
  * Date: 2018/7/19
  * Time: 下午11:41
  */
-
-include_once "../phpshow/loader.php";
+$file = getcwd()."/phpshow/loader.php";
+include_once $file;
 /*
  demo:
     $db = new \phpshow\lib\db();

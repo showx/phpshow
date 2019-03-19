@@ -63,6 +63,38 @@ class http
         return $result;
     }
 
+    public static function getProxy($url,$proxy_url)
+    {
+        // 要访问的目标页面
+//        $url = "http://baidu.com";
+        // 代理服务器
+//        $proxyServer = "http://ip:port";
+        // 隧道身份信息
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+        $referer_url = "https://www.qimai.cn";
+        curl_setopt($ch, CURLOPT_REFERER, $referer_url);
+        // 设置代理服务器
+//        curl_setopt($ch, CURLOPT_PROXYTYPE, 0); //http
+        curl_setopt($ch, CURLOPT_PROXYTYPE, 5); //sock5
+        curl_setopt($ch, CURLOPT_PROXY, $proxy_url);
+        // 设置隧道验证信息
+        curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727;)");
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch,CURLOPT_COOKIE,"PHPSESSID=eeufvhk6a5tbjj1sadngv84q97;USERINFO=jwBIL4sgIqiyVL2WlGgffCcEIhlopmjxBe2GtnoWxOSRErV73ZcbTBoohEmPpgm%2FwQFWFUJi0AW8jJcl5ViDbYKXm3Anczdw8pCx%2FmOrM%2BBVN6h8cmT0%2BPB1zKvIzxeiCPpeNS7L3SVEEGjhaq4nRgylGZOSMNR1");
+        $result = curl_exec($ch);
+        curl_close($ch);
+        return $result;
+    }
+
+
     /**
      * 向指定网址发送post请求
      * @parem $url
@@ -76,7 +108,7 @@ class http
         $startt = time();
         if(is_array($query_str))
         {
-            $query_str = http_build_query($url);
+            $query_str = http_build_query($query_str);
         }
         if( function_exists('curl_init') )
         {
@@ -164,5 +196,82 @@ class http
         {
             return false;
         }
+    }
+
+    /**
+     * rolling 表求数据
+     * @param $urls
+     */
+    public static function rolling($urls)
+    {
+        $mh = curl_multi_init();
+        foreach($urls as $key=>$url)
+        {
+            $ch{$key} = curl_init();
+            curl_setopt($ch{$key}, CURLOPT_URL, $url);
+            curl_setopt($ch{$key}, CURLOPT_HEADER, 0);
+            curl_setopt($ch{$key}, CURLOPT_CONNECTTIMEOUT, 2);
+            curl_setopt($ch{$key}, CURLOPT_TIMEOUT, 5);
+            curl_multi_add_handle($mh,$ch{$key});
+        }
+        $active = null;
+        do {
+            $mrc = curl_multi_exec($mh, $active);
+        } while ($mrc == CURLM_CALL_MULTI_PERFORM);
+
+        while ($active && $mrc == CURLM_OK) {
+            //这一段是核心
+//            while (curl_multi_exec($mh, $active) === CURLM_CALL_MULTI_PERFORM);
+            curl_multi_exec($mh, $active);
+            $tmp = curl_multi_select($mh);  //经常-1的原因
+            if ($tmp != -1) {
+                do {
+                    $mrc = curl_multi_exec($mh, $active);
+                } while ($mrc == CURLM_CALL_MULTI_PERFORM);
+            }
+        }
+        foreach($urls as $key=>$val)
+        {
+            curl_multi_remove_handle($mh, $ch{$key});
+        }
+        curl_multi_close($mh);
+    }
+
+    /**
+     * rolling 表求数据
+     * @param $urls
+     */
+    public static function rolling2($urls)
+    {
+        if(empty($urls))
+        {
+            return 'empty';
+        }
+
+        $mh = curl_multi_init();
+        foreach ($urls as $i => $url) {
+            $conn[$i] = curl_init($url);
+            curl_setopt($conn[$i], CURLOPT_RETURNTRANSFER, 1);
+            curl_multi_add_handle($mh, $conn[$i]);
+        }
+        do {
+            $status = curl_multi_exec($mh, $active);
+            $info = curl_multi_info_read($mh);
+            if (false !== $info) {
+//                var_dump($info);
+            }
+        } while ($status === CURLM_CALL_MULTI_PERFORM || $active);
+
+        foreach ($urls as $i => $url) {
+            $res[$i] = curl_multi_getcontent($conn[$i]);
+            curl_close($conn[$i]);
+        }
+        $res2 = [];
+        foreach($res as $i=>$v)
+        {
+            $res2[$urls[$i]] = $v;
+        }
+        unset($res);
+        return $res2;
     }
 }

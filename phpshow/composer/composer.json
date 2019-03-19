@@ -9,6 +9,9 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "showx/mongox": "^1.0"
+        "showx/mongox": "^1.0",
+        "php-amqplib/php-amqplib": "^2.8",
+        "qcloud/cos-sdk-v5": "^1.2",
+        "tencentcloud/tencentcloud-sdk-php": "^3.0"
     }
 }

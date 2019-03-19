@@ -6,6 +6,26 @@
 namespace phpshow;
 class response
 {
+    public static $swObj = null;
+    public static $hander = null;
+
+    public static function setSw($response)
+    {
+        self::$swObj = $response;
+    }
+    public static function init()
+    {
+
+    }
+    public static function end($result)
+    {
+        if(self::$swObj)
+        {
+            self::$swObj->end($result);
+        }else{
+            echo $result;
+        }
+    }
     /**
      * 输出头部信息
      */
@@ -39,7 +59,14 @@ class response
     public static function json($code='0',$msg='',$data='')
     {
         $result = self::returnArray($code,$msg,$data);
-        echo json_encode($result);
+        $json_result = json_encode($result);
+        if(self::$swObj)
+        {
+            self::$swObj->end($json_result);
+        }else{
+            echo $json_result;
+        }
+
     }
 
     /**
@@ -52,6 +79,7 @@ class response
     {
         $result = self::returnArray($code,$msg,$data);
         return json_encode($result);
+
     }
 
     /**
@@ -90,7 +118,12 @@ class response
         }
         $xml .= "</data>";
 
-        echo $xml;
+        if(self::$swObj)
+        {
+            self::$swObj->end($xml);
+        }else{
+            echo $xml;
+        }
     }
 
     /**
