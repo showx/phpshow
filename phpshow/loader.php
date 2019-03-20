@@ -414,9 +414,19 @@ Class App{
                     echo 'start http'.lr;
                     $host = "0.0.0.0";  //* 127.0.0.1 phpshow.x7t.cn
                     $http = new \Swoole\Http\Server($host, 8080);
+                    if(!isset($argv['2']))
+                    {
+                        $argv['2'] = "";
+                    }
+                    if($argv['2'] == '-d')
+                    {
+                        $daemonize = true;
+                    }else{
+                        $daemonize = false;
+                    }
                     $http->set(array(
                         'worker_num' => 3,
-                        'daemonize' => true,
+                        'daemonize' => $daemonize,
                     ));
                     $http->on('request', function ($request, $response) use( $master ) {
                         $uri = $request->server['request_uri'];
