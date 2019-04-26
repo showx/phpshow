@@ -60,7 +60,7 @@ class tpl
 //            {
 //                $this->{$kk} = $vv;
 //            }
-            $this->result = $result;
+//            $this->result = $result;
             extract($result);
             ob_start();
             include self::include_file($file_name);

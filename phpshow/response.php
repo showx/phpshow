@@ -26,6 +26,15 @@ class response
             echo $result;
         }
     }
+    public static function write($result)
+    {
+        if(self::$swObj)
+        {
+            self::$swObj->write($result);
+        }else{
+            echo $result;
+        }
+    }
     /**
      * 输出头部信息
      */

@@ -106,3 +106,7 @@ function getlang($key)
 {
     return \phpshow\App::$master->lang[$key];
 }
+function recho($val)
+{
+    \response::write($val);
+}

@@ -211,6 +211,8 @@ Class show{
             $path = $realpath;
             $exist1 = ['ct','ac'];
             $exist2 = ['module','ct','ac'];
+            //module每次先重置为空
+            $this->module = '';
             $pathcount = count($path);
             if($pathcount>2)
             {
@@ -375,7 +377,11 @@ Class show{
                 $instance = new $ctl;
                 $instance->{$this->ac}();
             } else {
-                \response::end("404");
+                //客户端访问域名地址
+                echo lr."ctl:".$ctl.lr;
+                echo "ac:".$this->ac.lr;
+                var_dump(request::$forms);
+                \response::end("404-fucking control");
                 throw new \Exception('fucking control..');
             }
         }catch(\Throwable $e)
@@ -401,17 +407,20 @@ Class App{
         self::$master = new show();
         self::$master->addClassAlias();
         $master = self::$master;
+
+        //swoole 肯定是run_mode等于2的
         if(run_mode=='2')
         {
             request::$forms['argc'] = $argc;
             request::$forms['argv'] = $argv;
             //可使用 module/ct/ac 这种请求方式
+            //不同进行argv可能为空的情况
             if($argc>1)
             {
                 if($argv['1'] == 'start')
                 {
                     swoole_set_process_name("http");
-                    echo 'start http'.lr;
+//                    echo 'start http'.lr;
                     $host = "0.0.0.0";  //* 127.0.0.1 phpshow.x7t.cn
                     $http = new \Swoole\Http\Server($host, 8080);
                     if(!isset($argv['2']))
@@ -427,9 +436,12 @@ Class App{
                     $http->set(array(
                         'worker_num' => 3,
                         'daemonize' => $daemonize,
+                        'log_file' => PS_RUNTIME.'/swoolehttp.log'
+
                     ));
                     $http->on('request', function ($request, $response) use( $master ) {
                         $uri = $request->server['request_uri'];
+                        //没进入这里
                         if ($uri == '/favicon.ico') {
                             $response->status(404);
                             $response->end();
@@ -441,19 +453,17 @@ Class App{
                     });
                     $http->start();
                     exit();
+                }else{
+                    request::$forms["ct"] = $argv['1'];
+                    if(isset($argv['2']))
+                    {
+                        request::$forms["ac"] = $argv['2'];
+                    }
+                    if(isset($argv['3']))
+                    {
+                        request::$forms["command"] = $argv['3'];
+                    }
                 }
-
-
-                request::$forms["ct"] = $argv['1'];
-                if(isset($argv['2']))
-                {
-                    request::$forms["ac"] = $argv['2'];
-                }
-                if(isset($argv['3']))
-                {
-                    request::$forms["command"] = $argv['3'];
-                }
-
 
             }
 

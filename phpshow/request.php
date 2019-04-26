@@ -24,6 +24,8 @@ class request
     //严禁保存的文件名
     public static $filter_filename = '/\.(php|pl|sh|js)$/i';
 
+    public static $request = null;
+
    /**
     * 初始化用户请求
     * 对于 post、get 的数据，会转到 selfforms 数组， 并删除原来数组
