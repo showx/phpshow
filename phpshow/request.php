@@ -24,8 +24,6 @@ class request
     //严禁保存的文件名
     public static $filter_filename = '/\.(php|pl|sh|js)$/i';
 
-    public static $request = null;
-
    /**
     * 初始化用户请求
     * 对于 post、get 的数据，会转到 selfforms 数组， 并删除原来数组
@@ -33,6 +31,16 @@ class request
     */
     public static function init($request = null)
     {
+        //每次初始化应该清空一下$form
+        //用户的cookie
+        self::$cookies = array();
+        //把GET、POST的变量合并一块，相当于 _REQUEST
+        self::$forms = array();
+        //_GET 变量
+        self::$gets = array();
+        //_POST 变量
+        self::$posts = array();
+
         $magic_quotes_gpc = ini_get('magic_quotes_gpc');
         $request_arr = [];
         if($request)
@@ -96,7 +104,6 @@ class request
         }
 //        var_dump(self::$request_mdthod);
 //        var_dump($request_arr);
-
 
         unset($_POST);
         unset($_GET);
