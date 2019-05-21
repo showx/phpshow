@@ -18,6 +18,9 @@ phpshow,简单易用的php框架,为何要开发这个框架。为了提高自�
 1.  Nginx + php7以上 + mysql
 2.  php扩展seaslog、swoole、redis
 
+## 安装
+composer require showx/phpshow
+
 ## 协议
 phpshow 的开源协议为 Apache-2.0，详情参见[LICENSE](LICENSE)
 
