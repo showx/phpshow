@@ -179,7 +179,7 @@ Class debug
     public static function show_debug_error()
     {
 
-        if(\phpshow\App::$master->config['site']['debug'] == 0)
+        if(\phpshow\Loader::$master->config['site']['debug'] == 0)
         {
             return '';
         }

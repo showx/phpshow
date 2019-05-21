@@ -60,8 +60,8 @@ Class show{
     {
         $this->begin();
         spl_autoload_register(array($this, 'autoload'));
-        //增加上composer加载
-        require PS_PATH.'/composer/vendor/autoload.php';
+        //增加上composer加载 不采用composer内嵌的方式
+        // require PS_PATH.'/composer/vendor/autoload.php';
         //默认必定的加载的类
         request::init();
         //发生异常的记录
@@ -288,7 +288,7 @@ Class show{
      */
     public function addClassAlias(Array $result_me = [])
     {
-//        echo "addClassAlias".lr;
+        //这样处理会造成ide找不到类，还是习惯use 加载方式
         $result = [
             'util' => 'phpshow\helper\util',
             'log' => 'phpshow\lib\log',
@@ -304,7 +304,7 @@ Class show{
             'model' => 'phpshow\model',
             'request' => 'phpshow\request',
             'response' => 'phpshow\response',
-            'App' => 'phpshow\App',
+            'Loader' => 'phpshow\Loader',
         ];
         if(run_mode =='1')
         {
@@ -398,7 +398,7 @@ Class show{
 }
 
 //App加载类
-Class App{
+Class loader{
 
     public static $master;
     public static $result = array();
@@ -535,4 +535,4 @@ Class App{
 
 
 }
-App::start($argc,$argv);
+// App::start($argc,$argv);

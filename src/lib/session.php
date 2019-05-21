@@ -11,6 +11,7 @@ namespace phpshow\lib;
 
 
 //接口参数
+//将gc_probability 也调成1000，那gc_probability/gc_divisor 就等于1了，也就是百分一百会触发。这样就垃圾回收概率就大的多。
 ini_set('session.gc_divisor', 1000);
 ini_set('session.gc_probability', 1000);
 //session_write_close();
@@ -22,8 +23,9 @@ session_set_save_handler(
     "\phpshow\lib\session::destroy",
     "\phpshow\lib\session::gc"
 );
-//$session_path = PS_RUNTIME;
-$session_path = "/tmp/";
+//后面可使用
+$session_path = PS_RUNTIME;
+// $session_path = "/tmp/";
 session_save_path( $session_path.'/session' );
 //echo 'session start';
 
@@ -58,6 +60,7 @@ class session
      */
     public static function init($save_path, $cookie_name)
     {
+        // echo 'session init'.lr;
         self::$session_name = $cookie_name;
         self::$session_path = $save_path;
         self::$session_id   = session_id();
@@ -72,6 +75,7 @@ class session
      */
     public static function read( $id )
     {
+        // echo 'session read'.lr;
         $file = self::$session_path."/sess_{$id}";
         if(file_exists($file))
         {
@@ -90,6 +94,7 @@ class session
      */
     public static function write($id, $sess_data)
     {
+        // echo 'session write'.lr;
         return file_put_contents(self::$session_path."/sess_$id", $sess_data) === false ? false : true;
     }
 
@@ -100,6 +105,7 @@ class session
      */
     public static function destroy( $id )
     {
+        echo 'session destroy'.lr;
         $file = self::$session_path."/sess_$id";
         if (file_exists($file)) {
 
@@ -115,6 +121,9 @@ class session
      */
     public static function gc($max_lifetime)
     {
+        // echo "gc max".$max_lifetime;
+        // echo 'session gc'.lr;
+        // echo self::$session_path;
 //        return true;
         //需优化一下，使用crond来检查或改用单文件hash获取
         foreach (glob(self::$session_path."/sess_*") as $file) {
@@ -129,6 +138,7 @@ class session
      */
     public static function close()
     {
+        // echo 'session close'.lr;
         return true;
 
     }

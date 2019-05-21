@@ -104,7 +104,7 @@ function setlang($lang = 'zh_CN')
 //获取语言包的文字
 function getlang($key)
 {
-    return \phpshow\App::$master->lang[$key];
+    return \phpshow\Loader::$master->lang[$key];
 }
 function recho($val)
 {

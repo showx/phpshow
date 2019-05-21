@@ -1,1 +1,4 @@
 .idea
+./vendor
+vendor/*
+/src/runtime/*

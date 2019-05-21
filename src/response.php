@@ -137,12 +137,13 @@ class response
 
     /**
      * 设置cli输出颜色
+     * 更改为color
      * @param $text
      * @param $status
      * @return string
      * @throws Exception
      */
-    public static function clicolor($text, $status='1')
+    public static function color($text, $status='1')
     {
         //1 SUCCESS  2 FAILURE  3 WARNING 4 NOTE
         switch($status) {

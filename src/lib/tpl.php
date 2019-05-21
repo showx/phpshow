@@ -52,7 +52,7 @@ class tpl
     {
         if(empty($file_name))
         {
-//            $file_name = \phpshow\App::$master->ac;
+//            $file_name = \phpshow\Loader::$master->ac;
         }
         $result = self::$tpl_result;
         $closure = function($file_name) use($result){

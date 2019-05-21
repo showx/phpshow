@@ -1,0 +1,26 @@
+{
+    "name": "showx/phpshow",
+    "description" : "一个简单易用的php框架",
+    "type": "application",
+    "keywords": ["swoole","php","phpshow","framework"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "showx",
+            "email": "9448923@qq.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "showx/mongox": "^1.0"
+        
+    },
+    "autoload": {
+        "psr-4": {
+            "phpshow\\": "src/"
+        }
+    },
+    "bin": [
+        "run/phpshow"
+    ]
+}

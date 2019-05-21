@@ -26,7 +26,7 @@ class pgdb
      */
     public function connect()
     {
-        $config = \phpshow\App::getConfig("db")['postgresql'];
+        $config = \phpshow\Loader::getConfig("db")['postgresql'];
         $host        = "host=".$config['host'];
         $port        = "port=".$config['port'];
         $dbname      = "dbname=".$config['dbname'];
