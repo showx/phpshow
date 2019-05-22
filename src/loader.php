@@ -270,7 +270,7 @@ Class show{
         $endtime = microtime(true);
         $usetime = $endtime - $this->starttime;
         \phpshow\lib\debug::show_debug_error();
-        $cx_string =  lr."使用内存:".\util::bunit_convert($memory - $this->memory).lr;
+        $cx_string =  lr."使用内存:".\phpshow\helper\util::bunit_convert($memory - $this->memory).lr;
         $cx_string .= lr."使用时间:".sprintf('%.2f',$usetime)." sec".lr;
         if($this->config['site']['dev2'] == 1 && PS_ISAJAX=='0')
         {
@@ -381,7 +381,7 @@ Class show{
                 echo lr."ctl:".$ctl.lr;
                 echo "ac:".$this->ac.lr;
                 var_dump(request::$forms);
-                \response::end("404-fucking control");
+                response::end("404-fucking control");
                 throw new \Exception('fucking control..');
             }
         }catch(\Throwable $e)
@@ -448,7 +448,7 @@ Class loader{
                         }
                         request::init($request);
                         $master->miniroute();
-                        \response::setSw($response);
+                        response::setSw($response);
                         $master->run();
                     });
                     $http->start();

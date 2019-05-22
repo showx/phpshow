@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+use \phpshow\loader;
 /**
  *  PHP 入口执行
  *  没有控制器的脚本
@@ -8,10 +9,4 @@
  * Date: 2018/7/19
  * Time: 下午11:41
  */
-$file = getcwd()."/phpshow/loader.php";
-include_once $file;
-/*
- demo:
-    $db = new \phpshow\lib\db();
-    var_dump($db);
-*/
+loader::start($argc,$argv);
