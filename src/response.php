@@ -62,6 +62,7 @@ class response
         header('Pragma:no-cache');
         header("Expires:0");
     }
+    
     /**
      * 输出json
      */
@@ -89,6 +90,11 @@ class response
         $result = self::returnArray($code,$msg,$data);
         return json_encode($result);
 
+    }
+
+    public static function toJson($result)
+    {
+        echo json_encode($result);
     }
 
     /**

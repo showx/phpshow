@@ -110,3 +110,14 @@ function recho($val)
 {
     \response::write($val);
 }
+/**
+ * 模型实例
+ */
+function Model($name)
+{
+    if( substr($name,0,4)!=='mod_')
+    {
+        $name = "mod_".$name;
+    }
+    return "\\".PS_APP_NAME."\\model\\{$name}";
+}

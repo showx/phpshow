@@ -176,6 +176,19 @@ class request
         }
         return $value;
     }
+
+    /**
+     * json post
+     */
+    public static function postjson()
+    {
+        $tmp = file_get_contents("php://input");
+        if($tmp)
+        {
+            $tmp = json_decode($tmp,true);
+        }
+        return $tmp;
+    }
     
    /**
     * 获得get表单值

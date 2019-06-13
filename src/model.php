@@ -9,7 +9,8 @@
 
 namespace phpshow;
 
-use phpshow\helper\facade\db;
+use phpshow\lib\db;
+use phpshow\lib\pgdb;
 class model
 {
     //表格名
@@ -19,6 +20,8 @@ class model
     //页数
     public static $page = 1;
     public static $primary_key = 'id';
+    public static $db_type = 'mysql';
+    public static $db = '';
     //完成rest资源get post put delete
     /**
      * 数据库名
@@ -34,15 +37,32 @@ class model
         return static::$table_name;
     }
 
+    public static function dbinstance()
+    {
+        if(empty(static::$db))
+        {
+            if(static::$db_type == 'mysql')
+            {
+                self::$db = new db();
+            }else{
+                self::$db = new pgdb();
+            }
+        }
+        return self::$db;
+    }
+    
     /**
      * 获取一条数据
      * @return mixed
      */
-    public static function get_one()
+    public static function get_one($sql)
     {
         $table = self::table();
-        $sql = "select * from `{$table}` ";
-        $rows = db::get_one($sql);
+        if(empty($sql))
+        {
+            $sql = "select * from {$table} ";
+        }
+        $rows = self::dbinstance()->get_one($sql);
         return $rows;
     }
 
@@ -55,9 +75,9 @@ class model
         $table = self::table();
         if(empty($sql))
         {
-            $sql = "select * from `{$table}` ";
+            $sql = "select * from {$table} ";
         }
-        $rows = db::get_all($sql);
+        $rows = static::dbinstance()->get_all($sql);
         return $rows;
 
     }
@@ -69,13 +89,26 @@ class model
      * @param string $where
      * @param string $order
      */
-    public static function page_data($page, $where='')
+    public static function page_data($page, $where='',$fields = '*',$group = '',$order='')
     {
         $table = self::table();
         $limit = self::$limit;
         $offset = $limit * ($page - 1);
-        $sql = "select * from `{$table}` limit {$offset},{$limit} ";
-        $rows = self::get_all($sql);
+        // $data_sql = "select * from {$table}  where 1 {$where} limit {$offset},{$limit} ";
+        if($where)
+        {
+            $where = " where {$where}";
+        }
+        $data_sql = "select {$fields} from {$table} {$where} {$group} {$order} limit {$limit} OFFSET {$offset} ";
+        $data = static::dbinstance()->get_all($data_sql);
+        $count_sql = "select count(1) as c from {$table} {$where}";
+        $one = self::dbinstance()->get_one($count_sql);
+        $rows['list'] = $data;
+        $rows['pagination'] = [
+            'total' => (int)$one['c'],
+            'pageSize' => (int)$limit,
+            'current' => (int)$page,
+        ];
         return $rows;
     }
 
@@ -94,9 +127,9 @@ class model
         $arr_value = array_values($attrs);
         $keyss = implode('`,`',$arr_key);
         $valuess = implode("','",$arr_value);
-        $sql = "insert into `{$table}`(`{$keyss}`) values('{$valuess}') ";
-        db::query($sql);
-        return db::insert_id();
+        $sql = "insert into {$table}(`{$keyss}`) values('{$valuess}') ";
+        self::dbinstance()->query($sql);
+        return self::dbinstance()->insert_id();
     }
 
     /**
@@ -115,8 +148,9 @@ class model
             $update_arr[] = " `{$key}`='{$val}' ";
         }
         $update_string = implode(',',$update_arr);
-        $sql = "update `{$table}` set {$update_string} where {$where} ";
-        db::query($sql);
+        $sql = "update {$table} set {$update_string} where {$where} ";
+        // echo $sql.lr;
+        self::dbinstance()->query($sql);
     }
 
     /**
@@ -126,8 +160,8 @@ class model
     public static function delete($id){
         $table = self::table();
         $field = self::$primary_key;
-        $sql = "delete  from `{$table}` where `{$field}`='{$id}' ";
-        $rows = db::query($sql);
+        $sql = "delete  from {$table} where `{$field}`='{$id}' ";
+        $rows = self::dbinstance()->query($sql);
         return $rows;
     }
 

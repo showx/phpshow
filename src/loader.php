@@ -126,6 +126,8 @@ Class show{
 
         if(defined('PS_APP_PATH'))
         {
+            // var_dump($filename_sub);
+            // var_dump($this->autoloader);
             if(array_key_exists($filename_sub,$this->autoloader))
             {
                 $filePath = PS_APP_PATH.$this->autoloader[$filename_sub].$filename;
@@ -535,4 +537,4 @@ Class loader{
 
 
 }
-// App::start($argc,$argv);
+// loader::start($argc,$argv);
