@@ -91,12 +91,26 @@ class response
         return json_encode($result);
 
     }
-
+    /**
+     * json返回
+     */
     public static function toJson($result)
     {
         echo json_encode($result);
     }
-
+    /**
+     * 通用返回
+     */
+    public static function commonData($data,$page,$pageSize)
+    {
+        $rows['list'] = $data['list'];
+        $rows['pagination'] = [
+            'total' => (int)$data['total'],
+            'pageSize' => (int)$pageSize,
+            'current' => (int)$page,
+        ];
+        return $rows;
+    }
     /**
      * 返回array
      * @param string $code

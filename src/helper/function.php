@@ -60,7 +60,7 @@ function sCookie($key,$value)
     {
         return false;
     }
-    $site = \App::getConfig("site");
+    $site = \loader::getConfig("site");
     $expire = 1800;
     $_COOKIE[$key] = $value;
     return setcookie($key,$value,time() + $expire,'',$site['cookie_domain']);
@@ -119,5 +119,12 @@ function Model($name)
     {
         $name = "mod_".$name;
     }
-    return "\\".PS_APP_NAME."\\model\\{$name}";
+    $nameobj = \loader::getC($name);
+    if($nameobj == false)
+    {
+        \loader::setC($name,"\\".PS_APP_NAME."\\model\\{$name}");
+        $nameobj = \loader::getC($name);
+    }
+    return $nameobj;
+    // return "\\".PS_APP_NAME."\\model\\{$name}";
 }

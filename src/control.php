@@ -14,6 +14,8 @@ class control
 {
     //是否ajax请求
     public $is_ajax = false;
+    //默认使用的页数
+    public $pageSize = '20';
     public function __construct()
     {
         $this->is_ajax = $this->is_ajax();
@@ -21,9 +23,17 @@ class control
         {
             die('no access');
         }
-
     }
-
+    /**
+     * 默认选择时间的范围
+     */
+    public static function dateRange($day=7)
+    {
+        //7天之内
+        $endtime = date("Ymd",time());
+        $starttime = date("Ymd",time()-(86400*$day));
+        return "{$starttime} / {$endtime}";
+    }
     /**
      * 判断权限
      */
