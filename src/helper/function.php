@@ -60,7 +60,7 @@ function sCookie($key,$value)
     {
         return false;
     }
-    $site = \loader::getConfig("site");
+    $site = \phpshow\lib\config::get("site");
     $expire = 1800;
     $_COOKIE[$key] = $value;
     return setcookie($key,$value,time() + $expire,'',$site['cookie_domain']);

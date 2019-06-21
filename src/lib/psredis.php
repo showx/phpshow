@@ -20,7 +20,7 @@ class psredis
         {
             $redis = new \Redis();
             //config文件夹读取 不连接会出现Redis server went away
-            $config = \App::getConfig("db")['redis'];
+            $config = \phpshow\lib\config::get("db")['redis'];
             $redis->connect($config['host'], $config['port']);
             if(!empty($config['auth']))
             {

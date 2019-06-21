@@ -20,8 +20,4 @@ class acl
     //用户
     private $user_id = '';
 
-    public function loadconfig()
-    {
-
-    }
 }

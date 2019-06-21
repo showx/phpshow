@@ -9,10 +9,22 @@ namespace phpshow;
 error_reporting( E_ALL );
 defined("PS_DEBUG") or define("PS_DEUBG","1");
 
+
 define("PS_PATH",dirname(__FILE__));
-define("PS_CONFIG_PATH",PS_PATH."/config/");
+//todo 不一定默认就app，要有选择
+if(!defined("PS_APP_NAME"))
+{
+    //console取，默认使用App文件夹
+    define("PS_APP_NAME","app");
+    define("PS_APP_PATH",PS_PATH."/../".PS_APP_NAME);
+}
+define("PS_PATH2",dirname(PS_APP_PATH));
+//系统级配置
+define("PS_SYS_CONFIG_PATH",PS_PATH."/config/");
+define("PS_CONFIG_PATH",PS_PATH2."/config/");
 define("PS_HELPER_PATH",PS_PATH."/helper/");
-define("PS_RUNTIME",PS_PATH."/runtime/");
+define("PS_SYS_RUNTIME",PS_PATH."/runtime/");
+define("PS_RUNTIME",PS_PATH2."/runtime/");
 define("PS_LIB_PATH",PS_PATH."/lib/");
 define("PS_CORE","1111");
 
@@ -47,8 +59,6 @@ Class show{
     private $date_timestamp;
     //框架使用内存
     public $memory = 0;
-    //框架配置文件
-    public $config = array();
     //语言
     public $lang = array();
     public $module = "";
@@ -126,8 +136,6 @@ Class show{
 
         if(defined('PS_APP_PATH'))
         {
-            // var_dump($filename_sub);
-            // var_dump($this->autoloader);
             if(array_key_exists($filename_sub,$this->autoloader))
             {
                 $filePath = PS_APP_PATH.$this->autoloader[$filename_sub].$filename;
@@ -151,39 +159,6 @@ Class show{
     }
 
     /**
-     * 配置文件的读取
-     * 默认加载 phpshow config -> app config
-     */
-    public function config()
-    {
-
-        $config_arr = include PS_CONFIG_PATH.DIRECTORY_SEPARATOR.'include.php';
-        foreach($config_arr as $load_key => $load_config)
-        {
-            $this->config[$load_key] = include PS_CONFIG_PATH.DIRECTORY_SEPARATOR.$load_config.'.php';
-        }
-        if($this->config['site']['lang_on'] == '1')
-        {
-            $lang = $this->config['site']['lang_default'];
-            $lang_file = PS_CONFIG_PATH.DIRECTORY_SEPARATOR.'lang'.DIRECTORY_SEPARATOR.$lang.'.php';
-            if(file_exists($lang_file))
-            {
-                $this->lang = include $lang_file;
-            }
-        }
-    }
-
-    /**
-     * 加载配置文件
-     * @param $key
-     * @param $value
-     */
-    public function loadConfig($key,$value)
-    {
-        $this->config[$key] = include PS_CONFIG_PATH.DIRECTORY_SEPARATOR.$value;
-    }
-
-    /**
      * phpshow路由处理
      * 规则只有一种
      * /ct/ac
@@ -191,8 +166,7 @@ Class show{
      */
     public function miniroute()
     {
-        $this->config();
-        $route_rule = $this->config['route'];
+        $route_rule = \phpshow\lib\config::get("route");
         //也可以获取路由规则的
         //读取获取到的参数,ct,ac只能根据url来
         $this->ct = !empty(request::item("ct"))?request::item("ct"):$this->ct;
@@ -274,7 +248,7 @@ Class show{
         \phpshow\lib\debug::show_debug_error();
         $cx_string =  lr."使用内存:".\phpshow\helper\util::bunit_convert($memory - $this->memory).lr;
         $cx_string .= lr."使用时间:".sprintf('%.2f',$usetime)." sec".lr;
-        if($this->config['site']['dev2'] == 1 && PS_ISAJAX=='0')
+        if(\phpshow\lib\config::get("site")['dev2'] == 1 && PS_ISAJAX=='0')
         {
             if(run_mode=='1')
             {
@@ -356,12 +330,7 @@ Class show{
     public function run()
     {
         try{
-            if(!defined("PS_APP_NAME"))
-            {
-                //console取，默认使用App文件夹
-                define("PS_APP_NAME","app");
-                define("PS_APP_PATH",PS_PATH."/../".PS_APP_NAME);
-            }
+            
             if(!empty($this->module))
             {
                 $ctl  = PS_APP_NAME."\\".$this->module.'\control\ctl_'.$this->ct;
@@ -391,7 +360,7 @@ Class show{
             }
         }catch(\Throwable $e)
         {
-            if($this->config['site']['dev'] == '1')
+            if(\phpshow\lib\config::get("site")['dev'] == '1')
             {
                 lookdata($e);
             }
@@ -412,7 +381,6 @@ Class loader{
         self::$master = new show();
         self::$master->addClassAlias();
         $master = self::$master;
-
         //swoole 肯定是run_mode等于2的
         if(run_mode=='2')
         {
@@ -422,17 +390,16 @@ Class loader{
             //不同进行argv可能为空的情况
             if($argc>1)
             {
-                if($argv['1'] == 'start')
+                if($argv['1'] == 'http' && $argv['2'] == 'start')
                 {
                     swoole_set_process_name("http");
-//                    echo 'start http'.lr;
-                    $host = "0.0.0.0";  //* 127.0.0.1 phpshow.x7t.cn
+                    $host = "0.0.0.0";
                     $http = new \Swoole\Http\Server($host, 8080);
-                    if(!isset($argv['2']))
+                    if(!isset($argv['3']))
                     {
-                        $argv['2'] = "";
+                        $argv['3'] = "";
                     }
-                    if($argv['2'] == '-d')
+                    if($argv['3'] == '-d')
                     {
                         $daemonize = true;
                     }else{
@@ -442,7 +409,6 @@ Class loader{
                         'worker_num' => 3,
                         'daemonize' => $daemonize,
                         'log_file' => PS_RUNTIME.'/swoolehttp.log'
-
                     ));
                     $http->on('request', function ($request, $response) use( $master ) {
                         $uri = $request->server['request_uri'];
@@ -457,6 +423,17 @@ Class loader{
                         $master->run();
                     });
                     $http->start();
+                    exit();
+                }elseif($argv['1'] == 'cron' && $argv['2'] == 'start')
+                {
+                    echo 'cron'.lr;
+                    if(!isset($argv['3']))
+                    {
+                        $argv['3'] = '';
+                    }
+                    //启动cron模式
+                    $cron = new \phpshow\lib\cron($argv['3']);
+                    $cron->start();
                     exit();
                 }else{
                     request::$forms["ct"] = $argv['1'];
@@ -524,7 +501,7 @@ Class loader{
      */
     public static function getConfig($key='')
     {
-        return self::$master->config[$key];
+        return \phpshow\lib\config::get($key);
     }
 
     /**

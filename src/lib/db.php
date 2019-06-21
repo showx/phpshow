@@ -31,7 +31,7 @@ class db
         {
             $conn = "master";
         }
-        $config = \loader::getConfig("db")['mysql'][$conn];
+        $config = \phpshow\lib\config::get("db.mysql")[$conn];
         $this->conn = mysqli_connect($config['host'],$config['username'],$config['password'],$config['dbname'],$config['port']) or die('mysql connect error');
 //        mysqli_select_db($this->conn,$config['dbname']);
 //        $this->query(" use `{$dbname}`; ");

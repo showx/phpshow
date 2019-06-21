@@ -4,7 +4,7 @@
  * Author:shengsheng
  */
 return [
-    'db' => 'database',
+    // 'db' => 'database',
     'route' => 'route_rule',
     'site' => 'site',
 ];

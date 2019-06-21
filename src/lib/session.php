@@ -90,6 +90,7 @@ class session
      * 写入指定id的session数据
      * @parem $id
      * @parem $sess_data
+     * todo 考虑改成多级目录
      * @return void
      */
     public static function write($id, $sess_data)
