@@ -426,13 +426,8 @@ Class loader{
                     exit();
                 }elseif($argv['1'] == 'cron' && $argv['2'] == 'start')
                 {
-                    echo 'cron'.lr;
-                    if(!isset($argv['3']))
-                    {
-                        $argv['3'] = '';
-                    }
                     //启动cron模式
-                    $cron = new \phpshow\lib\cron($argv['3']);
+                    $cron = new \phpshow\lib\cron();
                     $cron->start();
                     exit();
                 }else{

@@ -47,7 +47,9 @@ class model
         }
         return $this->table_name;
     }
-
+    /**
+     *  切换数据驱动
+     */
     public function dbinstance()
     {
         if(empty($this->db))

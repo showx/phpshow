@@ -16,8 +16,14 @@ class control
     public $is_ajax = false;
     //默认使用的页数
     public $pageSize = '20';
+    public $commander;
     public function __construct()
     {
+        if( PHP_SAPI == 'cli' )
+        {
+            $this->commander = \phpshow\lib\command();
+        }
+
         $this->is_ajax = $this->is_ajax();
         if(!self::_Acl())
         {
