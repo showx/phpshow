@@ -108,9 +108,8 @@ Class config
             $data = self::instance()->config[$config_name];
             if($data)
             {
-                foreach($keys as $ckey)
+                foreach($keys as $cckey)
                 {
-                    $cckey = array_shift($ckey);
                     if(isset($data[$cckey]))
                     {
                         $data = $data[$cckey];
