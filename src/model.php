@@ -68,11 +68,11 @@ class model
      * 获取一条数据
      * @return mixed
      */
-    public function get_one($sql)
+    public function get_one($where = '',$sql = '')
     {
         if(empty($sql))
         {
-            $sql = "select * from {$this->table_name} ";
+            $sql = "select * from {$this->table_name} {$where} ";
         }
         $rows = $this->dbinstance()->get_one($sql);
         return $rows;
@@ -95,12 +95,13 @@ class model
     public function find()
     {
         $sql = " select {$this->fields} from {$this->table_name} {$this->condition}";
-        return $this->get_one($sql);
+        //使用db类的get_one
+        return $this->dbinstance()->get_one($sql);
     }
     public function findAll()
     {
         $sql = " select {$this->fields} from {$this->table_name} {$this->condition} {$this->condition_limit}";
-        return $this->get_all();
+        return $this->dbinstance()->get_all();
     }
     /**
      * 字段
@@ -253,7 +254,7 @@ class model
             $update_arr[] = " `{$key}`='{$val}' ";
         }
         $update_string = implode(',',$update_arr);
-        $sql = "update {$ths->table_name} set {$update_string} where {$where} ";
+        $sql = "update {$this->table_name} set {$update_string} where {$where} ";
         // echo $sql.lr;
         self::dbinstance()->query($sql);
     }
