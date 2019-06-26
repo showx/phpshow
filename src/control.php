@@ -17,6 +17,10 @@ class control
     //默认使用的页数
     public $pageSize = '20';
     public $commander;
+    //默认时间范围为7天
+    public $date_type = "7";
+    //[1本天|2昨天|7一周|8月]
+    public $date_type_range = ['1'=>'0','2'=>'1','7'=>'7','8'=>'30'];
     public function __construct()
     {
         if( PHP_SAPI == 'cli' )
@@ -33,9 +37,18 @@ class control
     /**
      * 默认选择时间的范围
      */
-    public static function dateRange($day=7)
+    public function dateRange($day=7)
     {
+        if(empty($this->date_type))
+        {
+            return '';
+        }
         //7天之内
+        if($this->date_type=='7')
+        {
+            $day = '7';
+        }
+        $day = $this->date_type_range[$date_type];
         $endtime = date("Ymd",time());
         $starttime = date("Ymd",time()-(86400*$day));
         return "{$starttime} / {$endtime}";
