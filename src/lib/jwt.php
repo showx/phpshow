@@ -1,6 +1,7 @@
 <?php
 /**
  * jwt(json web token)
+ * 往config里获取key
  * 前端jwt校验(https://jwt.io/)
  * Author:show
  */
@@ -14,8 +15,13 @@ class jwt
     /**
      * 加密
      */
-    public function encode($payload,$key):string
+    public function encode($payload,$key=''):string
     {
+        if(empty($key))
+        {
+            $key = \phpshow\lib\config::get("signkey")['privatekey'];
+            $key = $this->privatekey($key);
+        }
         //分三段
         //header.payload.signature[ ha256(b64(header).b64(payload),secret) ]
         //header
@@ -45,6 +51,11 @@ class jwt
      */
     public function decode($jwt, $key = '')
     {
+        if(empty($key))
+        {
+            $key = \phpshow\lib\config::get("signkey")['publickey'];
+            $key = $this->publickey($key);
+        }
         $timestamp = time();
         if (empty($key)) {
             return false;
@@ -112,7 +123,6 @@ class jwt
     {
         $signature = '';
         $success = openssl_sign($msg, $signature, $key, "SHA256");
-        var_dump($success);
         if (!$success) {
             return false;
         } else {
