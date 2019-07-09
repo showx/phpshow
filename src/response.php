@@ -50,14 +50,14 @@ class response
         $arr_type = [
             'error' => '500',
             //Unauthorized
-            'noauth' => '401',
+            'unauth' => '401',
             //Forbidden
             'forbidden' => '403',
             //默认success
             'success' => '200',
             'notfound' => '404',
         ];
-        if(!siset($arr_type))
+        if(!isset($arr_type))
         {
             $type = "success";
         }

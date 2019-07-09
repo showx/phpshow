@@ -173,6 +173,9 @@ class model
                 }else{
                     $where_clause .= ' order by ' . $where['order'];
                 }
+            }else{
+                //默认id降序排序
+                $where_clause .= ' order by id desc ';
             }
             if(isset($where['limit']))
             {

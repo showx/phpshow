@@ -14,6 +14,8 @@ class control
 {
     //是否ajax请求
     public $is_ajax = false;
+    //是否校验token
+    public $auth_token_page = 0;
     //默认使用的页数
     public $pageSize = '20';
     public $commander;
@@ -23,6 +25,20 @@ class control
     public $date_type_range = ['1'=>'0','2'=>'1','7'=>'7','8'=>'30'];
     public function __construct()
     {
+        if($this->auth_token_page == 1)
+        {
+            $authorization = $_SERVER['HTTP_AUTHORIZATION'];
+            $jwt = new \phpshow\lib\jwt();
+            //验证authorization
+            $data = $jwt->decode($authorization);
+            if($data == false)
+            {
+                \phpshow\response::code("unauth");
+                echo \phpshow\response::toJson(['code'=>'-1','msg'=>'unauth']);
+                exit();
+            }
+        }
+
         if( PHP_SAPI == 'cli' )
         {
             $this->commander = \phpshow\lib\command();
