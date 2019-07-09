@@ -38,9 +38,31 @@ class response
     /**
      * 输出头部信息
      */
-    public static function getHeader()
+    public static function Header()
     {
         header('Content-Type: text/html; charset=utf-8');
+    }
+    /**
+     * 设置响应状态码
+     */
+    public static function code($type = "success")
+    {
+        $arr_type = [
+            'error' => '500',
+            //Unauthorized
+            'noauth' => '401',
+            //Forbidden
+            'forbidden' => '403',
+            //默认success
+            'success' => '200',
+            'notfound' => '404',
+        ];
+        if(!siset($arr_type))
+        {
+            $type = "success";
+        }
+        $code = $arr_type[$type];
+        http_response_code($code);
     }
 
     /**

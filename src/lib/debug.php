@@ -109,8 +109,11 @@ Class debug
         }
         fclose($fp);
         //如果错误行用 @ 进行屏蔽，不显示错误
-        if( $error_line[0]=='@' || preg_match("/[\(\t ]@/", $error_line) ) {
-            return '@';
+        if($error_line)
+        {
+            if( $error_line[0]=='@' || preg_match("/[\(\t ]@/", $error_line) ) {
+                return '@';
+            }
         }
         $err = '';
         if( $log_type=='debug' )
