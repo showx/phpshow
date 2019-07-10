@@ -16,6 +16,7 @@ class control
     public $is_ajax = false;
     //是否校验token
     public $auth_token_page = 0;
+    public $auth_data;
     //默认使用的页数
     public $pageSize = '20';
     public $commander;
@@ -27,16 +28,7 @@ class control
     {
         if($this->auth_token_page == 1)
         {
-            $authorization = $_SERVER['HTTP_AUTHORIZATION'];
-            $jwt = new \phpshow\lib\jwt();
-            //验证authorization
-            $data = $jwt->decode($authorization);
-            if($data == false)
-            {
-                \phpshow\response::code("unauth");
-                echo \phpshow\response::toJson(['code'=>'-1','msg'=>'unauth']);
-                exit();
-            }
+            $this->authtoken();
         }
 
         if( PHP_SAPI == 'cli' )
@@ -49,6 +41,28 @@ class control
         {
             die('no access');
         }
+    }
+    /**
+     * auth token验证
+     */
+    public function authtoken()
+    {
+        if(isset($_SERVER['HTTP_AUTHORIZATION']))
+        {
+            $authorization = $_SERVER['HTTP_AUTHORIZATION'];
+            $jwt = new \phpshow\lib\jwt();
+            //验证authorization
+            $data = $jwt->decode($authorization);
+        }else{
+            $data = false;
+        }
+        if($data == false)
+        {
+            \phpshow\response::code("unauth");
+            echo \phpshow\response::toJson(['code'=>'-1','msg'=>'unauth']);
+            exit();
+        }
+        $this->auth_data = $data;
     }
     /**
      * 默认选择时间的范围
