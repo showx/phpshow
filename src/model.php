@@ -24,6 +24,7 @@ class model
     public $db = '';
     public $fields = '*';
     public $condition = '';
+    public $condition_order = '';
     public $condition_limit = '';
     //完成rest资源get post put delete
     public function __construct()
@@ -101,7 +102,7 @@ class model
     }
     public function findAll()
     {
-        $sql = " select {$this->fields} from {$this->table_name} {$this->condition} {$this->condition_limit}";
+        $sql = " select {$this->fields} from {$this->table_name} {$this->condition} {$this->condition_order} {$this->condition_limit}";
         return $this->dbinstance()->get_all();
     }
     /**
@@ -170,13 +171,13 @@ class model
             {
                 if(is_array($where['order']))
                 {
-                    $where_clause .= ' order by ' . implode($where['order'], ',');
+                    $this->condition_order .= ' order by ' . implode($where['order'], ',');
                 }else{
-                    $where_clause .= ' order by ' . $where['order'];
+                    $this->condition_order .= ' order by ' . $where['order'];
                 }
             }else{
                 //默认id降序排序
-                $where_clause .= ' order by id desc ';
+                $this->condition_order .= ' order by id desc ';
             }
             if(isset($where['limit']))
             {
@@ -213,7 +214,7 @@ class model
         {
             $where = $this->condition;
         }
-        $data_sql = "select {$this->fields} from {$this->table_name} {$where} {$this->condition_limit}";
+        $data_sql = "select {$this->fields} from {$this->table_name} {$where} {$this->condition_order} {$this->condition_limit}";
         // echo $data_sql;exit();
         $data = $this->dbinstance()->get_all($data_sql);
         $one = $this->select(" count(1) as c ")->find();
