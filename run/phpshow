@@ -1,5 +1,8 @@
 #!/usr/bin/env php
 <?php
+// echo "cli\n";
+$bin_path = realpath(getcwd());
+require $bin_path.'/../autoload.php';
 use \phpshow\loader;
 /**
  *  PHP 入口执行
