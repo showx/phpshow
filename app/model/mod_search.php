@@ -23,6 +23,18 @@ class mod_search
         }elseif($op == 'like')
         {
             return " {$key} like '%{$value}%' ";
+        }elseif($op == 'int_in')
+        {
+            foreach($value as $vkey=>$vval)
+            {
+                $new_value[] = (int)$vval;
+            }
+            $new_value = implode("','",$new_value);
+            return " {$key} in ('{$new_value}') ";
+        }elseif($op == 'in')
+        {
+            $new_value = implode("','",$value);
+            return " {$key} in ('{$new_value}') ";
         }
     }
     /**
@@ -83,7 +95,6 @@ class mod_search
                 $where[$key] = mod_search::whereAss($key,$op,$tmp);
             }
         }
-        
         $sorter = \phpshow\request::item("sorter","");
         $sorter = self::explainSortArr($sorter);
         if($sorter)

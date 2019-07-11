@@ -49,6 +49,7 @@ class model
     }
     /**
      *  切换数据驱动
+     * @todo 后面整合pdo的db类就行了
      */
     public function dbinstance()
     {
