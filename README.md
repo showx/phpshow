@@ -11,6 +11,9 @@
 phpshow,简单易用的php框架,为何要开发这个框架。为了提高自己的编码能力，为了快速解决工作中遇到的难题。
 框架更改为composer的加载方式
 
+# demo
+框架示例:[phpshow](https://github.com/showx/phpshow_demo "phpshow"). 
+
 # 框架介绍
 1.  简单的mvc,快速开发而生
 2.  版本1.0
