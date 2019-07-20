@@ -23,10 +23,11 @@ session_set_save_handler(
     "\phpshow\lib\session::destroy",
     "\phpshow\lib\session::gc"
 );
-//后面可使用
+//后面可使用 
 $session_path = PS_RUNTIME;
 // $session_path = "/tmp/";
 session_save_path( $session_path.'/session' );
+//要确保有session的文件夹，不然session将会失效
 //echo 'session start';
 
 /**
