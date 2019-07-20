@@ -78,8 +78,12 @@ class db
             //慢查询，保存到sql日志文件
         }
         if (!$result) {
-            $mysql_error = 'Invalid query: ' . mysqli_error($this->conn);
-            echo $mysql_error.lr;
+            //调试模式才能显示
+            if(\phpshow\Loader::$master->config['site']['debug'] == 0)
+            {
+                $mysql_error = $sql.'Invalid query: ' . mysqli_error($this->conn);
+                echo $mysql_error.lr;
+            }
         }
         return $result;
     }

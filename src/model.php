@@ -46,7 +46,7 @@ class model
             $table_name = str_replace("mod_","",$table['0']);
             $this->table_name = $table_name;
         }
-        return $this->table_name;
+        return $this;
     }
     /**
      *  切换数据驱动
@@ -65,7 +65,14 @@ class model
         }
         return $this->db;
     }
-    
+    /**
+     * 设置字段
+     */
+    public function field($fields = "*")
+    {
+        $this->fields = $fields;
+        return $this;
+    }
     /**
      * 获取一条数据
      * @return mixed
@@ -145,7 +152,12 @@ class model
 			{
                 foreach($conditions as $key=> $value)
                 {
-                    $condition_arr[] = " {$where[$key]}  ";
+                    //判断where的写法
+                    if(strpos($key,$value) !== false){
+                        $condition_arr[] = " {$where[$key]}  ";
+                    }else{
+                        $condition_arr[] = " {$key} = '{$where[$key]}'  ";
+                    }
                 }
 				$where_clause = ' WHERE ' . implode($condition_arr, ' and ');
             }

@@ -67,8 +67,12 @@ class pgdb
             //慢查询，保存到sql日志文件
         }
         if (!$result) {
-            $error = 'Invalid query: ' . pg_last_error($this->conn);
-            echo $error.lr;
+            if(\phpshow\Loader::$master->config['site']['debug'] == 0)
+            {
+                $error = $sql.'Invalid query: ' . pg_last_error($this->conn);
+                echo $error.lr;
+            }
+            
         }
         return $result;
     }
