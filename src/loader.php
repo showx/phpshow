@@ -9,7 +9,6 @@ namespace phpshow;
 error_reporting( E_ALL );
 defined("PS_DEBUG") or define("PS_DEUBG","1");
 
-
 define("PS_PATH",dirname(__FILE__));
 //todo 不一定默认就app，要有选择
 if(!defined("PS_APP_NAME"))
@@ -26,7 +25,6 @@ define("PS_HELPER_PATH",PS_PATH."/helper/");
 define("PS_SYS_RUNTIME",PS_PATH."/runtime/");
 define("PS_RUNTIME",PS_PATH2."/runtime/");
 define("PS_LIB_PATH",PS_PATH."/lib/");
-define("PS_CORE","1111");
 
 //php_sapi_name()
 if( PHP_SAPI == 'cli' )
@@ -61,7 +59,6 @@ Class show{
     public $memory = 0;
     //语言
     public $lang = array();
-    public $module = "";
     public $ct = 'index';
     public $ac = 'index';
     public $bindings = array();
@@ -90,9 +87,12 @@ Class show{
      */
     public function begin()
     {
+        //不改动composer,使用这里的规则约束
         $this->autoloader = array(
             "ctl_" => "/control/",
             "mod_" => "/model/",
+            "utl_" => "/utils/",
+            
         );
         $this->starttime = microtime(true);
         $this->date_timestamp = time();
@@ -117,20 +117,20 @@ Class show{
     public function autoload($classname)
     {
         $classname = preg_replace("/[^0-9a-z_\/\\\\]/i", '', $classname);
+
         if( class_exists ( $classname ) ) {
             //已经加载过返回true
             return true;
         }
         $file = str_replace('\\', DIRECTORY_SEPARATOR, $classname).'.php';
         $file = PS_PATH.DIRECTORY_SEPARATOR.str_replace('phpshow', '', $file);
-//        echo $file.lr;
+    //    echo $file.lr;
         //这里加载的文件输出到debug框
         $this->loader_file[$classname] = $file;
         if (file_exists($file)) {
             require_once $file;
             return true;
         }
-
         $filename = basename($file);
         $filename_sub = substr($filename,0,4);
 
@@ -139,15 +139,6 @@ Class show{
             if(array_key_exists($filename_sub,$this->autoloader))
             {
                 $filePath = PS_APP_PATH.$this->autoloader[$filename_sub].$filename;
-                if(!empty($this->module))
-                {
-                    $fileModulePath = PS_APP_PATH.DIRECTORY_SEPARATOR.$this->module.$this->autoloader[$filename_sub].$filename;
-                    if(file_exists($fileModulePath))
-                    {
-                        require_once $fileModulePath;
-                        return true;
-                    }
-                }
                 if(file_exists($filePath))
                 {
                     require_once $filePath;
@@ -162,7 +153,6 @@ Class show{
      * phpshow路由处理
      * 规则只有一种
      * /ct/ac
-     * /module/ct/ac
      */
     public function miniroute()
     {
@@ -185,17 +175,8 @@ Class show{
                 }
             }
             $path = $realpath;
-            $exist1 = ['ct','ac'];
-            $exist2 = ['module','ct','ac'];
-            //module每次先重置为空
-            $this->module = '';
+            $exist = ['ct','ac'];
             $pathcount = count($path);
-            if($pathcount>2)
-            {
-                $exist = $exist2;
-            }else{
-                $exist = $exist1;
-            }
             $i = 0;
             foreach($path as $key=>$val)
             {
@@ -227,14 +208,6 @@ Class show{
         $this->module = preg_replace('/([^0-9a-z_])+/is','',$this->module);
         $this->ct = preg_replace('/([^0-9a-z_])+/is','',$this->ct);
         $this->ac = preg_replace('/([^0-9a-z_])+/is','',$this->ac);
-    }
-
-    /**
-     * 输出美好的世界
-     */
-    public function hello()
-    {
-        echo 'hello world';
     }
 
     /**
@@ -352,10 +325,13 @@ Class show{
                 $instance->{$this->ac}();
             } else {
                 //客户端访问域名地址
-                echo lr."ctl:".$ctl.lr;
-                echo "ac:".$this->ac.lr;
-                var_dump(request::$forms);
-                response::end("404-fucking control");
+                if(\phpshow\lib\config::get("site")['dev'] == '1')
+                {
+                    echo lr."ctl:".$ctl.lr;
+                    echo "ac:".$this->ac.lr;
+                    var_dump(request::$forms);
+                    response::end("404-fucking control");
+                }
                 throw new \Exception('fucking control..');
             }
         }catch(\Throwable $e)
