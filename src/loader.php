@@ -17,14 +17,11 @@ if(!defined("PS_APP_NAME"))
     define("PS_APP_NAME","app");
     define("PS_APP_PATH",PS_PATH."/../".PS_APP_NAME);
 }
-define("PS_PATH2",dirname(PS_APP_PATH));
 //系统级配置
 define("PS_SYS_CONFIG_PATH",PS_PATH."/config/");
-define("PS_CONFIG_PATH",PS_PATH2."/config/");
-define("PS_HELPER_PATH",PS_PATH."/helper/");
-define("PS_SYS_RUNTIME",PS_PATH."/runtime/");
-define("PS_RUNTIME",PS_PATH2."/runtime/");
-define("PS_LIB_PATH",PS_PATH."/lib/");
+define("PS_CONFIG_PATH",PS_APP_PATH."/config/");
+define("PS_RUNTIME",PS_APP_PATH."/runtime/");
+
 
 //php_sapi_name()
 if( PHP_SAPI == 'cli' )
@@ -37,7 +34,7 @@ if( PHP_SAPI == 'cli' )
     $argc = '';
     $argv = [];
 }
-require_once PS_HELPER_PATH.'/function.php';
+require_once PS_PATH."/helper/".'/function.php';
 if ( ini_get('register_globals') )
 {
     if (isset($_REQUEST['GLOBALS']) || isset($_FILES['GLOBALS'])) {
@@ -66,9 +63,6 @@ Class show{
     public function __construct()
     {
         $this->begin();
-        spl_autoload_register(array($this, 'autoload'));
-        //增加上composer加载 不采用composer内嵌的方式
-        // require PS_PATH.'/composer/vendor/autoload.php';
         //默认必定的加载的类
         request::init();
         //发生异常的记录
@@ -83,70 +77,13 @@ Class show{
     }
 
     /**
-     * 程序初此化
+     * 程序初始化
      */
     public function begin()
     {
-        //不改动composer,使用这里的规则约束
-        $this->autoloader = array(
-            "ctl_" => "/control/",
-            "mod_" => "/model/",
-            "utl_" => "/utils/",
-            
-        );
         $this->starttime = microtime(true);
         $this->date_timestamp = time();
         $this->memory = memory_get_usage();
-    }
-
-    /**
-     * 可以由用户自定义加载的配置
-     * @param $auto_arr
-     */
-    public function setAuloader($auto_arr)
-    {
-        if($auto_arr)
-        {
-            $this->autolader = array_merge($this->autolader,$auto_arr);
-        }
-    }
-    /**
-     * phpshow自动加载
-     * 遵守一定的规则加载
-     */
-    public function autoload($classname)
-    {
-        $classname = preg_replace("/[^0-9a-z_\/\\\\]/i", '', $classname);
-
-        if( class_exists ( $classname ) ) {
-            //已经加载过返回true
-            return true;
-        }
-        $file = str_replace('\\', DIRECTORY_SEPARATOR, $classname).'.php';
-        $file = PS_PATH.DIRECTORY_SEPARATOR.str_replace('phpshow', '', $file);
-    //    echo $file.lr;
-        //这里加载的文件输出到debug框
-        $this->loader_file[$classname] = $file;
-        if (file_exists($file)) {
-            require_once $file;
-            return true;
-        }
-        $filename = basename($file);
-        $filename_sub = substr($filename,0,4);
-
-        if(defined('PS_APP_PATH'))
-        {
-            if(array_key_exists($filename_sub,$this->autoloader))
-            {
-                $filePath = PS_APP_PATH.$this->autoloader[$filename_sub].$filename;
-                if(file_exists($filePath))
-                {
-                    require_once $filePath;
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     /**
@@ -195,17 +132,19 @@ Class show{
             }
         }
         $rule_index = $this->ct."/".$this->ac;
-        if(isset($route_rule[$rule_index]))
+        if($route_rule)
         {
-            $route_val = $route_rule[$rule_index];
-            if(strpos($route_val,"@"))
+            if(isset($route_rule[$rule_index]))
             {
-                $route_val = explode("@",$route_val);
-                $this->ct = $route_val['0'];
-                $this->ac = $route_val['1'];
+                $route_val = $route_rule[$rule_index];
+                if(strpos($route_val,"@"))
+                {
+                    $route_val = explode("@",$route_val);
+                    $this->ct = $route_val['0'];
+                    $this->ac = $route_val['1'];
+                }
             }
         }
-        $this->module = preg_replace('/([^0-9a-z_])+/is','',$this->module);
         $this->ct = preg_replace('/([^0-9a-z_])+/is','',$this->ct);
         $this->ac = preg_replace('/([^0-9a-z_])+/is','',$this->ac);
     }
@@ -230,49 +169,6 @@ Class show{
                 echo $cx_string;
             }
         }
-    }
-    /**
-     * 增加别名
-     * @param array $result_me
-     */
-    public function addClassAlias(Array $result_me = [])
-    {
-        //这样处理会造成ide找不到类，还是习惯use 加载方式
-        $result = [
-            'util' => 'phpshow\helper\util',
-            'log' => 'phpshow\lib\log',
-            'acl' => 'phpshow\lib\acl',
-            'api' => 'phpshow\lib\api',
-            'tpl' => 'phpshow\lib\tpl',
-            'db' => 'phpshow\lib\db',
-            'debug' => 'phpshow\lib\debug',
-            'facade' => 'phpshow\lib\facade',
-            'http' => 'phpshow\lib\http',
-            'psredis' => 'phpshow\lib\psredis',
-            'control' => 'phpshow\control',
-            'model' => 'phpshow\model',
-            'request' => 'phpshow\request',
-            'response' => 'phpshow\response',
-            'Loader' => 'phpshow\Loader',
-        ];
-        if(run_mode =='1')
-        {
-            $result['session'] = 'phpshow\lib\session';
-            //启用session
-        }
-        if(!empty($result_me))
-        {
-            $result = array_merge($result,$result_me);
-        }
-        foreach($result as $key=>$val)
-        {
-            class_alias($val, '\\'.$key);
-        }
-//        if(run_mode=='1')
-//        {
-            //用的时候才代码开启
-//            session_start();
-//        }
     }
     /**
      * 容器的绑定
@@ -303,22 +199,8 @@ Class show{
     public function run()
     {
         try{
-            
-            if(!empty($this->module))
-            {
-                $ctl  = PS_APP_NAME."\\".$this->module.'\control\ctl_'.$this->ct;
-            }else{
-                $ctl  = PS_APP_NAME.$this->module.'\control\ctl_'.$this->ct;
-            }
+            $ctl  = PS_APP_NAME.'\control\ctl_'.$this->ct;
             //强制运行在cli下的规则
-            if(substr($this->ct,0,7)=='command' || substr($this->ac,0,7)=='command' )
-            {
-                if(run_mode!='2')
-                {
-                    die('run cli');
-                }
-            }
-
             if( method_exists ( $ctl, $this->ac ) === true )
             {
                 $instance = new $ctl;
@@ -334,17 +216,15 @@ Class show{
                 }
                 throw new \Exception('fucking control..');
             }
+            //todo 另外catch,这种比较难看
         }catch(\Throwable $e)
         {
             if(\phpshow\lib\config::get("site")['dev'] == '1')
             {
                 lookdata($e);
             }
-            //这种异常写日志
         }
-
     }
-
 }
 
 //App加载类
@@ -355,7 +235,6 @@ Class loader{
     public static function start($argc='',$argv='')
     {
         self::$master = new show();
-        self::$master->addClassAlias();
         $master = self::$master;
         //swoole 肯定是run_mode等于2的
         if(run_mode=='2')

@@ -1,4 +1,5 @@
 .idea
+/vender/
 vendor/*
 /src/runtime/*
 composer.lock

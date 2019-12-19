@@ -7,7 +7,7 @@
 namespace phpshow\lib;
 
 
-class command
+class console
 {
     private $color = [
         "none"          =>  "\033[0m",

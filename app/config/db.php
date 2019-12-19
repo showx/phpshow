@@ -8,17 +8,17 @@ return [
         'master' => [
             'host' => '172.18.0.7',
             'port' => '3306',
-            'dbname' => 'phpshow',
+            'dbname' => 'web_account',
             'username' => 'root',
             'password' => 'root',
         ],
     ],
    'postgresql' => [
-       'host' => '127.0.0.1',
+       'host' => '172.18.0.4',
        'port' => '5432',
-       'dbname' => 'show',
-       'username' => 'postgres',
-       'password' => 'postgres',
+       'dbname' => 'data',
+       'username' => 'root',
+       'password' => 'root',
    ],
     'redis' => [
         'host' => '127.0.0.1',

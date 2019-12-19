@@ -6,21 +6,12 @@
  * Author:show
  */
 namespace phpshow\lib;
+use phpshow\helper\traits\instance;
 Class config
 {
+    use instance;
     //框架配置文件
     public $config = array();
-    public static $instance = null;
-    public $lang;
-    public static function instance()
-    {
-        if(self::$instance == null)
-        {
-            self::$instance = new self();
-            self::$instance->system_config();
-        }
-        return self::$instance;
-    }
     /**
      * 初始化配置
      * 先要引进文件
@@ -37,26 +28,13 @@ Class config
                 }
             }
             //加载配置文件
-            $file1 = PS_SYS_CONFIG_PATH.$filename.".php";
             $file2 = PS_CONFIG_PATH.$filename.".php";
-            // echo "debug:".$file1.lr.$file2.lr;
-            $file_exist1 = file_exists($file1);
             $file_exist2 = file_exists($file2);
-            if($file_exist1)
-            {
-                $file_arr1 = include $file1;
-            }
             if($file_exist2)
             {
                 $file_arr2 = include $file2;
             }
-            if($file_exist1 && $file_exist2)
-            {
-                self::instance()->config[$filename] = array_merge($file_arr1,$file_arr2);
-            }elseif($file_exist1)
-            {
-                self::instance()->config[$filename] = $file_arr1;
-            }elseif($file_exist2)
+            if($file_exist2)
             {
                 self::instance()->config[$filename] = $file_arr2;
             }
@@ -64,30 +42,7 @@ Class config
         
     }
 
-    /**
-     * 加载系统配置
-     * 配置文件的读取
-     * 默认加载 phpshow config -> app config
-     */
-    public function system_config()
-    {
-        $config_arr = include PS_SYS_CONFIG_PATH.DIRECTORY_SEPARATOR.'include.php';
-        foreach($config_arr as $load_key => $load_config)
-        {
-            $arr = include PS_SYS_CONFIG_PATH.DIRECTORY_SEPARATOR.$load_config.'.php';
-            self::instance()->config[$load_key] = $arr;
-        }
-        //lang语言包的加载
-        if(self::instance()->config['site']['lang_on'] == '1')
-        {
-            $lang = self::instance()->config['site']['lang_default'];
-            $lang_file = PS_SYS_CONFIG_PATH.DIRECTORY_SEPARATOR.'lang'.DIRECTORY_SEPARATOR.$lang.'.php';
-            if(file_exists($lang_file))
-            {
-                self::instance()->lang = include $lang_file;
-            }
-        }
-    }
+    
 
     /**
      * 获取配置

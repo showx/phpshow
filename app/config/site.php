@@ -4,23 +4,15 @@
  * Author:shengsheng
  */
 return [
-    'url' => '',
-    'cdn_url' => '',
-    'upload_dir' => '',
     'session_dir' => 'session',
-    //域名
-    'domain' => '',
     //cookie
     'cookie_domain' => '',
     'cookie_pwd' => 'oSEx@uuw!ppr',
-    //是否开启多语言
-    'lang_on' => 1,
-    'lang_default' => 'zh-cn',
     //调试模式
     'debug' => 1,
-    //开发模式
+    //开发模式 [dev 查看加载异常|dev2 查看接口使用内存等]
     'dev' => 1,
     'dev2' => 0,
     //框架版本
-    'version' => '2.0', 
+    'version' => '3.0', 
 ];

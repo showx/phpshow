@@ -10,7 +10,7 @@
 namespace phpshow\lib;
 
 
-class psredis
+class redis
 {
     public static $hand_ob = null;
 

@@ -150,9 +150,8 @@ class util
      */
     public static function sendmail($mail_to, $mail_fromname, $mail_from, $mail_subject, $mail_body, $mail_type='')
     {
-        require_once PATH_LIBRARY.'/PHPMailer/PHPMailerAutoload.php';
 
-        $mail = new PHPMailer;
+        $mail = new \PHPMailer;
         $mail->SMTPDebug = 3;                               // Enable verbose debug output
 
         $mail->isSMTP();                                      // Set mailer to use SMTP

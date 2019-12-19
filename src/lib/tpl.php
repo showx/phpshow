@@ -8,7 +8,7 @@
  */
 
 namespace phpshow\lib;
-
+use \phpshow\response;
 
 class tpl
 {
@@ -67,7 +67,7 @@ class tpl
 
             $res = ob_get_contents();
             ob_end_clean();
-            \response::end($res);
+            response::end($res);
 
 //            return ob_end_flush();
 //            ob_get_clean();

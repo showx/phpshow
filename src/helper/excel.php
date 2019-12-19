@@ -2,7 +2,6 @@
 namespace phpshow\helper;
 
 //可compose导入
-// require_once PS_HELPER_PATH . '/phpexcel/PHPExcel.php';
 // $cacheMethod = PHPExcel_CachedObjectStorageFactory::cache_to_phpTemp;
 // $cacheSettings = array( 'memoryCacheSize' => '8MB');
 // PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
