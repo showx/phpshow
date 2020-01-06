@@ -63,7 +63,7 @@ class http
         return $result;
     }
 
-    public static function getProxy($url,$proxy_url)
+    public static function getProxy($url,$proxy_url,$referer_url = "https://www.qimai.cn")
     {
         // 要访问的目标页面
 //        $url = "http://baidu.com";
@@ -75,7 +75,6 @@ class http
         curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-        $referer_url = "https://www.qimai.cn";
         curl_setopt($ch, CURLOPT_REFERER, $referer_url);
         // 设置代理服务器
 //        curl_setopt($ch, CURLOPT_PROXYTYPE, 0); //http
@@ -100,7 +99,7 @@ class http
      * @parem $url
      * @parem $query_str
      * @parem $type=''
-     * @parem $$timeout=5
+     * @parem $timeout=5
      * @return string
      */
     public static function post($url, $query_str, $type='',$timeout=5)

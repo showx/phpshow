@@ -76,6 +76,10 @@ Class config
             }
         }else{
             self::instance()->include($key);
+            if(!isset(self::instance()->config[$key]))
+            {
+                return '';
+            }
             return self::instance()->config[$key];
         }
     }

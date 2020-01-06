@@ -234,6 +234,8 @@ Class loader{
     public static $result = array();
     public static function start($argc='',$argv='')
     {
+        global $argc;
+        global $argv;
         self::$master = new show();
         $master = self::$master;
         //swoole 肯定是run_mode等于2的
@@ -241,6 +243,7 @@ Class loader{
         {
             request::$forms['argc'] = $argc;
             request::$forms['argv'] = $argv;
+            // var_dump($argv);
             //可使用 module/ct/ac 这种请求方式
             //不同进行argv可能为空的情况
             if($argc>1)

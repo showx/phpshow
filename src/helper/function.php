@@ -108,7 +108,7 @@ function getlang($key)
 }
 function recho($val)
 {
-    \response::write($val);
+    \phpshow\response::write($val);
 }
 /**
  * 模型实例
@@ -119,11 +119,11 @@ function Model($name)
     {
         $name = "mod_".$name;
     }
-    $nameobj = \loader::getC($name);
+    $nameobj = \phpshow\loader::getC($name);
     if($nameobj == false)
     {
-        \loader::setC($name,"\\".PS_APP_NAME."\\model\\{$name}");
-        $nameobj = \loader::getC($name);
+        \phpshow\loader::setC($name,"\\".PS_APP_NAME."\\model\\{$name}");
+        $nameobj = \phpshow\loader::getC($name);
     }
     return $nameobj;
     // return "\\".PS_APP_NAME."\\model\\{$name}";

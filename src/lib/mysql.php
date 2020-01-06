@@ -79,7 +79,7 @@ class mysql
         }
         if (!$result) {
             //调试模式才能显示
-            if(\phpshow\Loader::$master->config['site']['debug'] == 0)
+            if(\phpshow\lib\config::get('site.debug') == 0)
             {
                 $mysql_error = $sql.'Invalid query: ' . mysqli_error($this->conn);
                 echo $mysql_error.lr;

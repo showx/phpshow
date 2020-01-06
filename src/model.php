@@ -9,7 +9,7 @@
 
 namespace phpshow;
 
-use phpshow\lib\db;
+use phpshow\lib\mysql;
 use phpshow\lib\pgdb;
 class model
 {
@@ -58,7 +58,7 @@ class model
         {
             if($this->db_type == 'mysql')
             {
-                $this->db = new db();
+                $this->db = new mysql();
             }else{
                 $this->db = new pgdb();
             }
@@ -252,6 +252,7 @@ class model
         $keyss = implode('`,`',$arr_key);
         $valuess = implode("','",$arr_value);
         $sql = "insert into {$this->table_name}(`{$keyss}`) values('{$valuess}') ";
+        // echo $sql;exit();
         $this->dbinstance()->query($sql);
         return $this->dbinstance()->insert_id();
     }

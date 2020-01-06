@@ -33,7 +33,7 @@ class control
 
         if( PHP_SAPI == 'cli' )
         {
-            $this->commander = new \phpshow\lib\command();
+            // $this->commander = new \phpshow\lib\command();
         }
 
         $this->is_ajax = $this->is_ajax();
