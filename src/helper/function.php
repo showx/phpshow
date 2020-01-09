@@ -16,14 +16,20 @@ function dump(...$data)
     var_dump($data);
     echo '</pre>';
 }
-
+/**
+ * jsondecode
+ */
+function jd($data)
+{
+    return json_decode($data,true);
+}
 /**
  * 解释出json转arr输出
  * @param $data
  */
 function dumpJson($data)
 {
-    $data = json_decode($data,true);
+    $data = jd($data);
     echo '<pre>';
     var_dump($data);
     echo '</pre>';
@@ -127,4 +133,11 @@ function Model($name)
     }
     return $nameobj;
     // return "\\".PS_APP_NAME."\\model\\{$name}";
+}
+/**
+ * 方便输出pre标签
+ */
+function echopre()
+{
+    echo '<pre>';
 }
