@@ -63,7 +63,7 @@ class http
         return $result;
     }
 
-    public static function getProxy($url,$proxy_url,$referer_url = "https://www.qimai.cn")
+    public static function getProxy($url,$proxy_url,$cookie="",$referer_url = "https://www.qimai.cn")
     {
         // 要访问的目标页面
 //        $url = "http://baidu.com";
@@ -74,7 +74,6 @@ class http
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
         curl_setopt($ch, CURLOPT_REFERER, $referer_url);
         // 设置代理服务器
 //        curl_setopt($ch, CURLOPT_PROXYTYPE, 0); //http
@@ -87,7 +86,10 @@ class http
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch,CURLOPT_COOKIE,"PHPSESSID=eeufvhk6a5tbjj1sadngv84q97;USERINFO=jwBIL4sgIqiyVL2WlGgffCcEIhlopmjxBe2GtnoWxOSRErV73ZcbTBoohEmPpgm%2FwQFWFUJi0AW8jJcl5ViDbYKXm3Anczdw8pCx%2FmOrM%2BBVN6h8cmT0%2BPB1zKvIzxeiCPpeNS7L3SVEEGjhaq4nRgylGZOSMNR1");
+        if(!empty($cookie))
+        {
+            curl_setopt($ch,CURLOPT_COOKIE,$cookie);
+        }
         $result = curl_exec($ch);
         curl_close($ch);
         return $result;
