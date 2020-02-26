@@ -153,7 +153,7 @@ class model
                 foreach($conditions as $key=> $value)
                 {
                     //判断where的写法
-                    if(strpos($key,$value) !== false){
+                    if(strpos($value,$key) !== false){
                         $condition_arr[] = " {$where[$key]}  ";
                     }else{
                         $condition_arr[] = " {$key} = '{$where[$key]}'  ";

@@ -45,11 +45,15 @@ class control
     /**
      * auth token验证
      */
-    public function authtoken()
+    public function authtoken($authorization = '')
     {
+        //HTTP_X_TOKEN
         if(isset($_SERVER['HTTP_AUTHORIZATION']))
         {
             $authorization = $_SERVER['HTTP_AUTHORIZATION'];
+        }
+        if(!empty($authorization))
+        {
             $jwt = new \phpshow\lib\jwt();
             //验证authorization
             $data = $jwt->decode($authorization);
@@ -78,7 +82,7 @@ class control
         {
             $day = '7';
         }
-        $day = $this->date_type_range[$date_type];
+        $day = $this->date_type_range[$this->date_type];
         $endtime = date("Ymd",time());
         $starttime = date("Ymd",time()-(86400*$day));
         return "{$starttime} / {$endtime}";

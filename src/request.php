@@ -113,7 +113,7 @@ class request
             foreach($request_arr as $k => $v)
             {
                  if( preg_match('/^config/i', $k) ) {
-                     throw new Exception('request var name not alllow!');
+                     throw new \Exception('request var name not alllow!');
                      exit();
                  }
                  if( !$magic_quotes_gpc ) {
@@ -174,7 +174,6 @@ class request
         } else {
             return $defaultvalue;
         }
-        return $value;
     }
 
     /**
@@ -200,7 +199,6 @@ class request
         } else {
             return $defaultvalue;
         }
-        return $value;
     }
     
    /**
@@ -213,7 +211,6 @@ class request
         } else {
             return $defaultvalue;
         }
-        return $value;
     }
     
    /**
