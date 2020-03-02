@@ -66,6 +66,7 @@ class control
             echo \phpshow\response::toJson(['code'=>'-1','msg'=>'unauth']);
             exit();
         }
+        //可实时验证一下status
         $this->auth_data = $data;
     }
     /**

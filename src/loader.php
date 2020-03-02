@@ -4,7 +4,7 @@
  * Author:show
  */
 namespace phpshow;
-
+date_default_timezone_set('Asia/Shanghai');
 //错误等级定义
 error_reporting( E_ALL );
 defined("PS_DEBUG") or define("PS_DEUBG","1");
