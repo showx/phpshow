@@ -47,15 +47,23 @@ class mysql
 
     /**
      * 安全过滤
+     * 注意参数安全
      * @param $sql
      * @return mixed
      */
-    public function safe_string($sql)
+    public function escapeParam($param)
     {
         //values addslashes的时候处理
-//        $sql = mysqli_real_escape_string($this->conn,$sql);
-//        $safe_array = array("load file","truncate","--");
-//        str_replace($safe_array,"",$sql);
+        $param = mysqli_real_escape_string($this->conn,$param);
+        return $param;
+    }
+    /**
+     * 安全检测
+     */
+    public function safe_string($sql)
+    {
+        $safe_array = array("load file","truncate","--");
+        $sql = str_replace($safe_array,"",$sql);
         return $sql;
     }
 
@@ -67,20 +75,21 @@ class mysql
     public function query($sql)
     {
         $starttime = microtime(true);
-        $sql = $this->safe_string($sql);
-//        echo $sql.lr;
+        // $sql = $this->safe_string($sql);
+        // echo $sql.lr;
         $result = mysqli_query($this->conn,$sql);
-
         $endtime = microtime(true);
         $lasttime = $endtime - $starttime;
         if($lasttime>$this->late_time)
         {
             //慢查询，保存到sql日志文件
         }
+        // echo "mysql_time:".$lasttime.lr;
         if (!$result) {
             //调试模式才能显示
-            if(\phpshow\lib\config::get('site.debug') == 0)
+            // if(\phpshow\lib\config::get('site.debug') == 0)
             {
+                echo "sql_time:".$lasttime.lr;
                 $mysql_error = $sql.'Invalid query: ' . mysqli_error($this->conn);
                 echo $mysql_error.lr;
             }
@@ -130,8 +139,10 @@ class mysql
      */
     public function get_one($sql)
     {
+        $row = false;
         if(!strpos($sql,'limit'))
         {
+            //$sql语句结尾不能有;号
             $sql = $sql." limit 1 ";
         }
         $result = $this->query($sql);

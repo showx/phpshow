@@ -2,6 +2,7 @@
 namespace phpshow\lib;
 /**
  * 协程redis连接池
+ * 基于swoole
  * Author:show
  */
 class CoRedisPool

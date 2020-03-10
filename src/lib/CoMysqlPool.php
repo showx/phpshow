@@ -2,6 +2,7 @@
 namespace phpshow\lib;
 /**
  * mysql协程连接池
+ * 基于swoole
  * Author:show
  */
 class CoMysqlPool
