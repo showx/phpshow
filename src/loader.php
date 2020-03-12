@@ -7,21 +7,9 @@ namespace phpshow;
 date_default_timezone_set('Asia/Shanghai');
 //错误等级定义
 error_reporting( E_ALL );
-defined("PS_DEBUG") or define("PS_DEUBG","1");
-
 define("PS_PATH",dirname(__FILE__));
-//todo 不一定默认就app，要有选择
-if(!defined("PS_APP_NAME"))
-{
-    //console取，默认使用App文件夹
-    define("PS_APP_NAME","app");
-    define("PS_APP_PATH",PS_PATH."/../".PS_APP_NAME);
-}
-//系统级配置
-define("PS_SYS_CONFIG_PATH",PS_PATH."/config/");
 define("PS_CONFIG_PATH",PS_APP_PATH."/config/");
 define("PS_RUNTIME",PS_APP_PATH."/runtime/");
-
 
 //php_sapi_name()
 if( PHP_SAPI == 'cli' )
@@ -102,10 +90,15 @@ Class show{
         {
             //QUERY_STRING 参数为s
             $path = request::item("s");
+            if(empty($path) && !empty($_SERVER['PATH_INFO']))
+            {
+                $path = $_SERVER['PATH_INFO'];
+            }
             $path = explode("/",$path);
             $realpath = array();
             foreach($path as $key=>$val)
             {
+                $val = preg_replace("/([^\w])+/","",$val);
                 if(!empty($val))
                 {
                     $realpath[] = $val;
@@ -211,6 +204,7 @@ Class show{
                 {
                     echo lr."ctl:".$ctl.lr;
                     echo "ac:".$this->ac.lr;
+                    echo "forms";
                     var_dump(request::$forms);
                     response::end("404-fucking control");
                 }

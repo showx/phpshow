@@ -129,8 +129,8 @@ class request
         }
 
         //默认ac和ct
-        self::$forms['ct'] = isset(self::$forms['ct']) ? self::$forms['ct'] : 'index';
-        self::$forms['ac'] = isset(self::$forms['ac']) ? self::$forms['ac'] : 'index';
+        // self::$forms['ct'] = isset(self::$forms['ct']) ? self::$forms['ct'] : 'index';
+        // self::$forms['ac'] = isset(self::$forms['ac']) ? self::$forms['ac'] : 'index';
         
         //处理cookie
         if( count($_COOKIE) > 0 )
