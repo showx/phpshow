@@ -199,15 +199,6 @@ Class show{
                 $instance = new $ctl;
                 $instance->{$this->ac}();
             } else {
-                //客户端访问域名地址
-                if(\phpshow\lib\config::get("site")['dev'] == '1')
-                {
-                    echo lr."ctl:".$ctl.lr;
-                    echo "ac:".$this->ac.lr;
-                    echo "forms";
-                    var_dump(request::$forms);
-                    response::end("404-fucking control");
-                }
                 throw new \Exception('fucking control..');
             }
             //todo 另外catch,这种比较难看
@@ -215,8 +206,11 @@ Class show{
         {
             if(\phpshow\lib\config::get("site")['dev'] == '1')
             {
+                // echo $ctl."|".$this->ac;
+                
                 lookdata($e);
             }
+            echo $e->getMessage();exit();
         }
     }
 }

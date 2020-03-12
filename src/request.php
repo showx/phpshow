@@ -18,6 +18,8 @@ class request
     //_POST 变量
     public static $posts = array();
 
+    public static $pinfos = [];
+
     //用户的请求模式 GET 或 POST
     public static $request_mdthod = 'GET';
 
@@ -127,11 +129,9 @@ class request
                  }
             }
         }
-
         //默认ac和ct
         // self::$forms['ct'] = isset(self::$forms['ct']) ? self::$forms['ct'] : 'index';
         // self::$forms['ac'] = isset(self::$forms['ac']) ? self::$forms['ac'] : 'index';
-        
         //处理cookie
         if( count($_COOKIE) > 0 )
         {
@@ -139,6 +139,26 @@ class request
                 self::add_s( $_COOKIE );
             }
             self::$cookies = $_COOKIE;
+        }
+        $path_info = $_SERVER['PATH_INFO'];
+        if(!empty($path_info))
+        {
+            $path_info = explode("/",trim($path_info,"/"));
+            //去除ct与ac
+            array_shift($path_info);
+            array_shift($path_info);
+            if(!empty($path_info))
+            {
+                $pinfo = array_chunk($path_info,2);
+                self::$pinfos = [];
+                foreach($pinfo as $val)
+                {
+                    if(count($val) == 2)
+                    {
+                        self::$pinfos[$val['0']] = $val['1'];
+                    }
+                }
+            }
         }
 
     }
