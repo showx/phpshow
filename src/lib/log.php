@@ -25,6 +25,7 @@ class log
             $this->type = 2;
         }
         $this->setLogPath(PS_RUNTIME.'/log/');
+        //这里一定要有个地址
         if(empty($default_dir))
         {
             $default_dir = date("Ymd");
@@ -44,6 +45,7 @@ class log
             $date = date("YmdH");
             $time = time();
             $log = "[{$type}]".$data." time:{$time}\n";
+            // echo $log;exit();
             file_put_contents($this->path.'/'.$date.'.log',$log,FILE_APPEND|LOCK_EX);
         }
     }
@@ -111,7 +113,11 @@ class log
         {
             \SeasLog::setLogger($name);
         }else{
-            $this->path."/".$name."/";
+            $this->path = $this->path."/".$name."/";
+            //要判断一下mkdir吧
+            if (!is_dir($this->path)){
+                $this->dir_make($this->path);
+            }
         }
     }
 
@@ -119,9 +125,10 @@ class log
      * 创建文件夹
      * @return bool
      */
-    public function dir_make()
+    public function dir_make($path)
     {
-        return true;
+        $tmp = mkdir($path,0777,true);
+        return $tmp;
     }
 
 }

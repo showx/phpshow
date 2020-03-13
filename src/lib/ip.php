@@ -18,7 +18,8 @@ class ip
     public function __construct()
     {
         //增加
-        $path = './17monipdb.datx';
+        // $path = './17monipdb.datx';
+        $path = PS_PATH.'/lib/17monipdb.datx';
         $this->file = fopen($path, 'rb');
         $this->offset = unpack('Nlen', fread($this->file, 4));
         $this->index = fread($this->file, $this->offset['len'] - 4);
@@ -31,7 +32,6 @@ class ip
      */
     public function find($ip)
     {
-        echo 'hhh'.lr;
         if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === FALSE)
         {
             return FALSE; // or throw Exception?

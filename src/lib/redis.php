@@ -29,6 +29,14 @@ class redis
             self::$hand_ob = $redis;
         }
     }
+    /**
+     * 获取句柄
+     */
+    public function getHand()
+    {
+        self::handle();
+        return self::$hand_ob;
+    }
 
     /**
      * 静态调用方法
@@ -39,6 +47,7 @@ class redis
     public static function __callStatic($name, $arguments)
     {
         self::handle();
+        // var_dump(implode(",",$arguments));
         return self::$hand_ob->$name(implode(",",$arguments));
     }
 

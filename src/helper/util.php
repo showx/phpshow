@@ -10,6 +10,7 @@ namespace phpshow\helper;
 class util
 {
     public static $client_ip;
+    public static $iphand;
     /**
      * 获得用户的真实IP 地址
      *
@@ -52,6 +53,35 @@ class util
         self::$client_ip = $client_ip;
         return $client_ip;
     }
+
+    /**
+     * 生成盐
+     */
+    public function generateSalt($length = 12,$chars = null){
+        if( empty($chars) ){
+          $chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        }
+        $chars = str_shuffle($chars);
+        $num = $length < strlen($chars) - 1 ? $length:strlen($chars) - 1;
+        return substr($chars,0,$num);
+    }
+
+    /**
+     * 解析ip地址
+     */
+    public static function getIPCity($ip)
+    {
+        if(!self::$iphand)
+        {
+            self::$iphand = new \phpshow\lib\ip();
+        }
+        $data = self::$iphand->find($ip);
+        $result['Country'] = $data['0'] ?? '';
+        $result['Province'] = $data['1'] ?? '';
+        $result['City'] = $data['2'] ?? '';
+        return $result;
+    }
+
 
     /**
      * 获得当前的Url
@@ -150,15 +180,19 @@ class util
      */
     public static function sendmail($mail_to, $mail_fromname, $mail_from, $mail_subject, $mail_body, $mail_type='')
     {
-
-        $mail = new \PHPMailer;
+        include_once PS_PATH."/helper/phpmailer/PHPMailer.php";
+        include_once PS_PATH."/helper/phpmailer/Exception.php";
+        include_once PS_PATH."/helper/phpmailer/OAuth.php";
+        include_once PS_PATH."/helper/phpmailer/POP3.php";
+        include_once PS_PATH."/helper/phpmailer/SMTP.php";
+        $mail = new \PHPMailer\PHPMailer\PHPMailer;
         $mail->SMTPDebug = 3;                               // Enable verbose debug output
 
         $mail->isSMTP();                                      // Set mailer to use SMTP
         $mail->Host = 'smtp.exmail.qq.com';  // Specify main and backup SMTP servers
         $mail->SMTPAuth = true;                               // Enable SMTP authentication
-        $mail->Username = 'tiandi@luabuy.com';                 // SMTP username
-        $mail->Password = 'WWshow123';                           // SMTP password
+        $mail->Username = 'td@luabuy.com';                 // SMTP username
+        $mail->Password = '123';                           // SMTP password
         $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
         $mail->Port = 465;                                    // TCP port to connect to
 
