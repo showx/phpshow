@@ -47,8 +47,7 @@ class redis
     public static function __callStatic($name, $arguments)
     {
         self::handle();
-        // var_dump(implode(",",$arguments));
-        return self::$hand_ob->$name(implode(",",$arguments));
+        return call_user_func_array(array(self::$hand_ob,$name),$arguments);
     }
 
     /**
@@ -60,6 +59,6 @@ class redis
     public function __call($name, $arguments)
     {
         self::handle();
-        return self::$hand_ob->$name(implode(",",$arguments));
+        return call_user_func_array(array(self::$hand_ob,$name),$arguments);
     }
 }

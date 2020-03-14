@@ -28,8 +28,6 @@ class model extends Medoo
     public $primary_key = 'id';
     //数据库类型，暂时只支持mysql
     public $db_type = 'mysql';
-    //映射的db
-    public $db = '';
     //查询字段
     public $fields = '*';
     //条件
@@ -57,6 +55,11 @@ class model extends Medoo
         ];
         parent::__construct($options);
         
+    }
+
+    public function create()
+    {
+        return new static();
     }
 
     public function __set($key,$value)
@@ -93,7 +96,7 @@ class model extends Medoo
     {
         $limit = [($this->page-1)*$this->limit,$this->limit];
         $where['LIMIT'] = $limit;
-        return parent::select($this->table_name,'*',$where);
+        return parent::select($this->table_name,$this->fields,$where);
     }
 
     /**
