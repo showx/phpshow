@@ -47,6 +47,7 @@ Class show{
     public $ct = 'index';
     public $ac = 'index';
     public $bindings = array();
+    public $args = [];
     private $loader_file = array();
     public function __construct()
     {
@@ -84,8 +85,6 @@ Class show{
         $route_rule = \phpshow\lib\config::get("route");
         //也可以获取路由规则的
         //读取获取到的参数,ct,ac只能根据url来
-        $this->ct = !empty(request::item("ct"))?request::item("ct"):$this->ct;
-        $this->ac = !empty(request::item("ac"))?request::item("ac"):$this->ac;
 //        if(run_mode == '1')
         {
             //QUERY_STRING 参数为s
@@ -94,7 +93,7 @@ Class show{
             {
                 $path = $_SERVER['PATH_INFO'];
             }
-            $path = explode("/",$path);
+            $path = explode("/",trim($path,'/'));
             $realpath = array();
             foreach($path as $key=>$val)
             {
@@ -105,26 +104,18 @@ Class show{
                 }
             }
             $path = $realpath;
-            $exist = ['ct','ac'];
-            $pathcount = count($path);
-            $i = 0;
-            foreach($path as $key=>$val)
+            if($path)
             {
-                if(!empty($val))
-                {
-                    if($i == 0)
-                    {
-                        $tmp = current($exist);
-                        $this->$tmp = $val;
-                        $i = 1;
-                    }else{
-                        $tmp = next($exist);
-                        $this->$tmp = $val;
-                    }
-                }
+                $this->ct = $path['0'] ?? 'index';
+                $this->ac = $path['1'] ?? 'index';
             }
+            array_shift($path);
+            array_shift($path);
+            $this->args = $path;
+            //暂时不考虑使用反射获取参数
         }
         $rule_index = $this->ct."/".$this->ac;
+        //路由规则的优化
         if($route_rule)
         {
             if(isset($route_rule[$rule_index]))
@@ -192,12 +183,27 @@ Class show{
     public function run()
     {
         try{
-            $ctl  = PS_APP_NAME.'\control\ctl_'.$this->ct;
+            $ctl = '';
+            //允许新的Control命名方法 IndexController 前缀要大写
+            //新版本命令
+            $ctl1  = PS_APP_NAME."\\control\\".ucfirst($this->ct).'Controller';
+            //老式命令
+            $ctl2  = PS_APP_NAME.'\\control\\ctl_'.$this->ct;
+            if(class_exists($ctl1))
+            {
+                $ctl = $ctl1;
+            }elseif(class_exists($ctl2))
+            {
+                $ctl = $ctl2;
+            }
+            if(empty($ctl))
+            {
+                throw new \Exception('control1');
+            }
             //强制运行在cli下的规则
             if( method_exists ( $ctl, $this->ac ) === true )
             {
-                $instance = new $ctl;
-                $instance->{$this->ac}();
+                call_user_func_array(array($ctl, $this->ac), $this->args );
             } else {
                 throw new \Exception('fucking control..');
             }
@@ -207,7 +213,6 @@ Class show{
             if(\phpshow\lib\config::get("site")['dev'] == '1')
             {
                 // echo $ctl."|".$this->ac;
-                
                 lookdata($e);
             }
             echo $e->getMessage();exit();

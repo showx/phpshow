@@ -10,7 +10,7 @@
 namespace phpshow\lib;
 
 
-class pgdb
+class postgresql
 {
     //数据库链接
     public $link;

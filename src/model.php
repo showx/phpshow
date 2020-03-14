@@ -1,6 +1,7 @@
 <?php
 /**
  * 模型基类
+ * 继续Medoo上进行操作
  * Created by PhpStorm.
  * User: shengsheng
  * Date: 2018/7/19
@@ -9,28 +10,65 @@
 
 namespace phpshow;
 
-use phpshow\lib\mysql;
-use phpshow\lib\pgdb;
-class model
+use phpshow\lib\Medoo;
+
+class model extends Medoo
 {
     //表格名
     public $table_name = "";
-    //条数
+    //每页条数
     public $limit = 25;
-    //页数
+    //指定数据库
+    public $database = 'master';
+    //指定数据库名
+    public $db_name = '';
+    //当前页数
     public $page = 1;
+    //主键
     public $primary_key = 'id';
+    //数据库类型，暂时只支持mysql
     public $db_type = 'mysql';
+    //映射的db
     public $db = '';
+    //查询字段
     public $fields = '*';
+    //条件
     public $condition = '';
+    //order条件
     public $condition_order = '';
+    //sql limit
     public $condition_limit = '';
-    //完成rest资源get post put delete
+    //表格数据
+    public $attr;
+
     public function __construct()
     {
+        //自动效验表格名
         $this->table();
+        $config = \phpshow\lib\config::get("db.mysql")[$this->database];
+        $options = [
+            'database_type' => $this->db_type,  //'mysql',
+            'database_name' => !empty($this->db_name)?$this->db_name:$config['dbname'],
+            'server' => $config['host'],
+            'username' => $config['username'],
+            'password' => $config['password'],
+            'charset' => 'utf8',
+            'port' => 3306,
+        ];
+        parent::__construct($options);
+        
     }
+
+    public function __set($key,$value)
+    {
+        $this->attr[$key] = $value;
+    }
+    
+    public function __get($key)
+    {
+        return $this->attr[$key];
+    }
+
     /**
      * 数据库名
      * @return string
@@ -42,219 +80,43 @@ class model
         }
         if($this->table_name === ""){
             $table_name = get_called_class();
-            preg_match('#mod_[a-z]+#iu',$table_name,$table);
-            $table_name = str_replace("mod_","",$table['0']);
+            $table_name = str_replace(["mod_","Model"],"",$table_name);
             $this->table_name = $table_name;
         }
         return $this;
     }
-    /**
-     *  切换数据驱动
-     * @todo 后面整合pdo的db类就行了
-     */
-    public function dbinstance()
-    {
-        if(empty($this->db))
-        {
-            if($this->db_type == 'mysql')
-            {
-                $this->db = new mysql();
-            }else{
-                $this->db = new pgdb();
-            }
-        }
-        return $this->db;
-    }
-    /**
-     * 设置字段
-     */
-    public function field($fields = "*")
-    {
-        $this->fields = $fields;
-        return $this;
-    }
-    /**
-     * 获取一条数据
-     * @return mixed
-     */
-    public function get_one($where = '',$sql = '')
-    {
-        if(empty($sql))
-        {
-            $sql = "select * from {$this->table_name} {$where} ";
-        }
-        $rows = $this->dbinstance()->get_one($sql);
-        return $rows;
-    }
 
     /**
-     * 获取所有数据
-     * @return mixed
+     * 返回所有数据
      */
-    public function get_all($sql = '')
+    public function all($where = [])
     {
-        if(empty($sql))
-        {
-            $sql = "select * from {$this->table_name} ";
-        }
-        $rows = $this->dbinstance()->get_all($sql);
-        return $rows;
-
-    }
-    public function find()
-    {
-        $sql = " select {$this->fields} from {$this->table_name} {$this->condition}";
-        //使用db类的get_one
-        return $this->dbinstance()->get_one($sql);
-    }
-    public function findAll()
-    {
-        $sql = " select {$this->fields} from {$this->table_name} {$this->condition} {$this->condition_order} {$this->condition_limit}";
-        return $this->dbinstance()->get_all();
-    }
-    /**
-     * 字段
-     */
-    public function column($fields)
-    {
-        if(is_array($fields))
-        {
-            $this->fields = implode($fields,",");
-        }else{
-            $this->fields = $fields;
-        }
-        return $this;
-    }
-    /**
-     * column别名
-     */
-    public function select($fields)
-    {
-        return $this->column($fields);
-    }
-    
-    /**
-     * 条件
-     */
-    public function where($where)
-    {
-        if(empty($where))
-        {
-            return '';
-        }
-        if(is_array($where))
-        {
-			$conditions = array_diff_key($where, array_flip(
-				['group', 'order', 'having', 'limit', 'like']
-            ));
-            $where_clause = '';
-            if (!empty($conditions))
-			{
-                foreach($conditions as $key=> $value)
-                {
-                    //判断where的写法
-                    if(strpos($value,$key) !== false){
-                        $condition_arr[] = " {$where[$key]}  ";
-                    }else{
-                        $condition_arr[] = " {$key} = '{$where[$key]}'  ";
-                    }
-                }
-				$where_clause = ' WHERE ' . implode($condition_arr, ' and ');
-            }
-            if(isset($where['group']))
-            {
-                if(is_array($where['group']))
-                {
-                    $where_clause .= ' GROUP BY ' . implode($where['group'], ',');
-                }else{
-                    $where_clause .= ' group by ' . $where['group'];
-                }
-            }
-            if(isset($where['having']))
-            {
-                if(is_array($where['having']))
-                {
-                    $where_clause .= ' having  ' . implode($where['having'], ',');
-                }else{
-                    $where_clause .= ' having  ' . $where['having'];
-                }
-            }
-            if(isset($where['order']))
-            {
-                if(is_array($where['order']))
-                {
-                    $this->condition_order .= ' order by ' . implode($where['order'], ',');
-                }else{
-                    $this->condition_order .= ' order by ' . $where['order'];
-                }
-            }else{
-                //默认id降序排序
-                $this->condition_order .= ' order by id desc ';
-            }
-            if(isset($where['limit']))
-            {
-                if(is_array($where['limit']))
-                {
-                    $this->condition_limit = ' LIMIT ' . $where['limit'][1] . ' OFFSET ' . $where['limit'][0];
-                }else{
-                    $this->condition_limit .= ' LIMIT ' . $where['limit'];
-                }
-            }
-        }else{
-            $where_clause = $where;
-        }
-        $this->condition = $where_clause;
-        return $this;
-    }
-
-
-    /**
-     * 分页
-     * @param $page
-     * @param $size
-     * @param string $where
-     * @param string $order
-     */
-    public function pageData($where_tmp='')
-    {
-        $where = '';
-        if($where_tmp)
-        {
-            $where = " where {$where_tmp}";
-        }
-        if($this->condition && empty($where2))
-        {
-            $where = $this->condition;
-        }
-        $data_sql = "select {$this->fields} from {$this->table_name} {$where} {$this->condition_order} {$this->condition_limit}";
-        // echo $data_sql;exit();
-        $data = $this->dbinstance()->get_all($data_sql);
-        $one = $this->select(" count(1) as c ")->find();
-        $rows['list'] = $data;
-        $rows['total'] = (int)$one['c'];
-        
-        return $rows;
+        $limit = [($this->page-1)*$this->limit,$this->limit];
+        $where['LIMIT'] = $limit;
+        return parent::select($this->table_name,'*',$where);
     }
 
     /**
      * 插入新数据
      * @param $attrs
      */
-    public function insert($attrs)
+    public function insert($attrs = '')
     {
-        if(!is_array($attrs))
+
+        if(empty($attrs) && !empty($this->attr) )
         {
-            return false;
+            $attrs = $this->attr;
         }
-        $table = self::table();
-        $arr_key = array_keys($attrs);
-        $arr_value = array_values($attrs);
-        $keyss = implode('`,`',$arr_key);
-        $valuess = implode("','",$arr_value);
-        $sql = "insert into {$this->table_name}(`{$keyss}`) values('{$valuess}') ";
-        // echo $sql;exit();
-        $this->dbinstance()->query($sql);
-        return $this->dbinstance()->insert_id();
+        parent::insert($this->table_name,$attrs);
+        
+        if($this->error())
+        {
+            //debug下打印一下
+        }else{
+            $insert_id = $this->id();
+        }
+
+        return $insert_id;
     }
 
     /**
@@ -262,30 +124,18 @@ class model
      * @param $attrs
      */
     public function update($attrs,$where){
-        if(!is_array($attrs) && empty($where))
-        {
-            return false;
-        }
-        $update_arr = [];
-        foreach($attrs as $key=>$val)
-        {
-            $update_arr[] = " `{$key}`='{$val}' ";
-        }
-        $update_string = implode(',',$update_arr);
-        $sql = "update {$this->table_name} set {$update_string} where {$where} ";
-        // echo $sql.lr;
-        self::dbinstance()->query($sql);
+        //这个里where
+        $data = parent::update($this->table_name,$attrs,$where);
+        return  $data->rowCount();
     }
 
     /**
      * 删除数据
-     * 危险操作
+     * 只针对id处理
      * @param $id
      */
     public function delete($id){
-        $sql = "delete  from {$this->table_name} where `{$this->primary_key}`='{$id}' ";
-        $rows = self::dbinstance()->query($sql);
-        return $rows;
+        parent::delete($this->table_name,['id'=>$id]);
     }
 
 }

@@ -18,7 +18,33 @@ class qcloud
         $this->appid = $appid;
         $this->appsecret = $appsecret;
     }
+    /**
+     * 发送短信业务
+     */
+    public function sms($phone,$appid,$templateid)
+    {
+        //先测试，后修改
+        $domain = "sms.tencentcloudapi.com";
+        $url = "https://{$domain}/";
+        $params['Action'] = "SendSms";
+        $params['Version'] = "2019-07-11";
+        $params['TemplateID'] = $templateid;
+        $params['SmsSdkAppid'] = $appid;  
+        $params["PhoneNumberSet.0"] = $phone;
+        // $params["TemplateParamSet.0"] = "";
+        // $params["SessionContext"] = "";
 
+        $params = $this->common_param($params);
+//公共参数
+        $keystr = $this->makeSignPlainText($params,"GET",$domain,'/');
+        $params['Signature'] = $this->sign($keystr);
+
+        $url .= '?'.http_build_query($params);
+//        echo $url.lr;
+//        $result = \http::post($url,$params);
+        $result = http::get($url);
+        return $result;
+    }
 
     /**
      * 获取指标参数
