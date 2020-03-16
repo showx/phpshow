@@ -90,9 +90,17 @@ class model extends Medoo
     }
 
     /**
+     * get_one
+     */
+    public function get_one($where = [])
+    {
+        return parent::get($this->table_name,$this->fields,$where);
+    }
+
+    /**
      * 返回所有数据
      */
-    public function all($where = [])
+    public function get_all($where = [])
     {
         $limit = [($this->page-1)*$this->limit,$this->limit];
         $where['LIMIT'] = $limit;
@@ -112,9 +120,11 @@ class model extends Medoo
         }
         parent::insert($this->table_name,$attrs);
         
-        if($this->error())
+        if($this->error()['0'] != '00000')
         {
+            // var_dump($this->error());
             //debug下打印一下
+            return false;
         }else{
             $insert_id = $this->id();
         }
