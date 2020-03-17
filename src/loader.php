@@ -85,7 +85,7 @@ Class show{
         $route_rule = \phpshow\lib\config::get("route");
         //也可以获取路由规则的
         //读取获取到的参数,ct,ac只能根据url来
-//        if(run_mode == '1')
+       if(run_mode == '1')
         {
             //QUERY_STRING 参数为s
             $path = request::item("s");
@@ -113,6 +113,17 @@ Class show{
             array_shift($path);
             $this->args = $path;
             //暂时不考虑使用反射获取参数
+        }else{
+            global $argc;
+            global $argv;
+            $this->ct = $argv['1'] ?? 'index';
+            $this->ac = $argv['2'] ?? 'index';
+
+            array_shift($argv);
+            array_shift($argv);
+            array_shift($argv);
+            $this->args = $argv;
+
         }
         $rule_index = $this->ct."/".$this->ac;
         //路由规则的优化
@@ -203,7 +214,9 @@ Class show{
             //强制运行在cli下的规则
             if( method_exists ( $ctl, $this->ac ) === true )
             {
-                call_user_func_array(array($ctl, $this->ac), $this->args );
+                $newctl = new $ctl;
+                call_user_func_array(array($newctl, $this->ac), $this->args );
+                exit();
             } else {
                 throw new \Exception('fucking control..');
             }
@@ -227,8 +240,11 @@ Class loader{
     public static $result = array();
     public static function start($argc='',$argv='')
     {
-        global $argc;
-        global $argv;
+        if(empty($argc))
+        {
+            global $argc;
+            global $argv;
+        }
         self::$master = new show();
         $master = self::$master;
         //swoole 肯定是run_mode等于2的
@@ -282,15 +298,15 @@ Class loader{
                     $cron->start();
                     exit();
                 }else{
-                    request::$forms["ct"] = $argv['1'];
-                    if(isset($argv['2']))
-                    {
-                        request::$forms["ac"] = $argv['2'];
-                    }
-                    if(isset($argv['3']))
-                    {
-                        request::$forms["command"] = $argv['3'];
-                    }
+                    // request::$forms["ct"] = $argv['1'];
+                    // if(isset($argv['2']))
+                    // {
+                    //     request::$forms["ac"] = $argv['2'];
+                    // }
+                    // if(isset($argv['3']))
+                    // {
+                    //     request::$forms["command"] = $argv['3'];
+                    // }
                 }
 
             }
