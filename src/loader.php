@@ -48,7 +48,6 @@ Class show{
     public $ac = 'index';
     public $bindings = array();
     public $args = [];
-    private $loader_file = array();
     public function __construct()
     {
         $this->begin();
@@ -195,10 +194,7 @@ Class show{
     {
         try{
             $ctl = '';
-            //允许新的Control命名方法 IndexController 前缀要大写
-            //新版本命令
             $ctl1  = PS_APP_NAME."\\control\\".ucfirst($this->ct).'Controller';
-            //老式命令
             $ctl2  = PS_APP_NAME.'\\control\\ctl_'.$this->ct;
             if(class_exists($ctl1))
             {
@@ -240,78 +236,8 @@ Class loader{
     public static $result = array();
     public static function start($argc='',$argv='')
     {
-        if(empty($argc))
-        {
-            global $argc;
-            global $argv;
-        }
         self::$master = new show();
         $master = self::$master;
-        //swoole 肯定是run_mode等于2的
-        if(run_mode=='2')
-        {
-            request::$forms['argc'] = $argc;
-            request::$forms['argv'] = $argv;
-            // var_dump($argv);
-            //可使用 module/ct/ac 这种请求方式
-            //不同进行argv可能为空的情况
-            if($argc>1)
-            {
-                if($argv['1'] == 'http' && $argv['2'] == 'start')
-                {
-                    swoole_set_process_name("http");
-                    $host = "0.0.0.0";
-                    $http = new \Swoole\Http\Server($host, 8080);
-                    if(!isset($argv['3']))
-                    {
-                        $argv['3'] = "";
-                    }
-                    if($argv['3'] == '-d')
-                    {
-                        $daemonize = true;
-                    }else{
-                        $daemonize = false;
-                    }
-                    $http->set(array(
-                        'worker_num' => 3,
-                        'daemonize' => $daemonize,
-                        'log_file' => PS_RUNTIME.'/swoolehttp.log'
-                    ));
-                    $http->on('request', function ($request, $response) use( $master ) {
-                        $uri = $request->server['request_uri'];
-                        //没进入这里
-                        if ($uri == '/favicon.ico') {
-                            $response->status(404);
-                            $response->end();
-                        }
-                        request::init($request);
-                        $master->miniroute();
-                        response::setSw($response);
-                        $master->run();
-                    });
-                    $http->start();
-                    exit();
-                }elseif($argv['1'] == 'cron' && $argv['2'] == 'start')
-                {
-                    //启动cron模式
-                    $cron = new \phpshow\lib\cron();
-                    $cron->start();
-                    exit();
-                }else{
-                    // request::$forms["ct"] = $argv['1'];
-                    // if(isset($argv['2']))
-                    // {
-                    //     request::$forms["ac"] = $argv['2'];
-                    // }
-                    // if(isset($argv['3']))
-                    // {
-                    //     request::$forms["command"] = $argv['3'];
-                    // }
-                }
-
-            }
-
-        }
         self::$master->miniroute();
         self::$master->run();
     }
