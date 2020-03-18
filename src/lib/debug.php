@@ -41,7 +41,6 @@ Class debug
      */
     public static function handler_debug_error($errno, $errmsg, $filename, $linenum, $vars)
     {
-//        var_dump($errno,$errmsg);exit();
         $err = self::debug_format_errmsg('debug', $errno, $errmsg, $filename, $linenum, $vars);
         if( $err != '@' )
         {

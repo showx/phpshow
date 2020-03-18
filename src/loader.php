@@ -42,11 +42,9 @@ Class show{
     private $date_timestamp;
     //框架使用内存
     public $memory = 0;
-    //语言
-    public $lang = array();
     public $ct = 'index';
     public $ac = 'index';
-    public $bindings = array();
+    public $bindings = [];
     public $args = [];
     public function __construct()
     {
@@ -72,6 +70,55 @@ Class show{
         $this->starttime = microtime(true);
         $this->date_timestamp = time();
         $this->memory = memory_get_usage();
+    }
+
+    /**
+     * 程序结束时的调用
+     */
+    public function end()
+    {
+        $memory = memory_get_usage();
+        $endtime = microtime(true);
+        $usetime = $endtime - $this->starttime;
+        \phpshow\lib\debug::show_debug_error();
+        $cx_string =  lr."使用内存:".\phpshow\helper\util::bunit_convert($memory - $this->memory).lr;
+        $cx_string .= lr."使用时间:".sprintf('%.2f',$usetime)." sec".lr;
+        if(\phpshow\lib\config::get("site")['dev2'] == 1 && PS_ISAJAX=='0')
+        {
+            if(run_mode=='1')
+            {
+                lookdata($cx_string);
+            }else{
+                echo $cx_string;
+            }
+        }
+    }
+
+    /**
+     * 容器的绑定
+     * @param $abstract
+     * @param $concrete
+     */
+    public function bind($abstract,$concrete){
+        $this->bindings[$abstract] = $concrete;
+    }
+
+    /**
+     * 容器调用
+     * @param $abstract
+     * @param array $parameters
+     * @return mixed
+     */
+    public function make($abstract,$parameters=[]){
+        if(!isset($this->bindings[$abstract]))
+        {
+            return false;
+        }
+        if(empty($parameters))
+        {
+            return $this->bindings[$abstract];
+        }
+        return call_user_func_array($this->bindings[$abstract],$parameters);
     }
 
     /**
@@ -144,52 +191,8 @@ Class show{
     }
 
     /**
-     * 程序结束时的调用
+     * 运行程序
      */
-    public function end()
-    {
-        $memory = memory_get_usage();
-        $endtime = microtime(true);
-        $usetime = $endtime - $this->starttime;
-        \phpshow\lib\debug::show_debug_error();
-        $cx_string =  lr."使用内存:".\phpshow\helper\util::bunit_convert($memory - $this->memory).lr;
-        $cx_string .= lr."使用时间:".sprintf('%.2f',$usetime)." sec".lr;
-        if(\phpshow\lib\config::get("site")['dev2'] == 1 && PS_ISAJAX=='0')
-        {
-            if(run_mode=='1')
-            {
-                lookdata($cx_string);
-            }else{
-                echo $cx_string;
-            }
-        }
-    }
-    /**
-     * 容器的绑定
-     * @param $abstract
-     * @param $concrete
-     */
-    public function bind($abstract,$concrete){
-        $this->bindings[$abstract] = $concrete;
-    }
-    /**
-     * 容器调用
-     * @param $abstract
-     * @param array $parameters
-     * @return mixed
-     */
-    public function make($abstract,$parameters=[]){
-        if(!isset($this->bindings[$abstract]))
-        {
-            return false;
-        }
-        if(empty($parameters))
-        {
-            return $this->bindings[$abstract];
-        }
-        return call_user_func_array($this->bindings[$abstract],$parameters);
-    }
-
     public function run()
     {
         try{
@@ -234,15 +237,10 @@ Class loader{
 
     public static $master;
     public static $result = array();
-    public static function start($argc='',$argv='')
+    public static function start()
     {
         self::$master = new show();
-        $master = self::$master;
         self::$master->miniroute();
-        self::$master->run();
-    }
-    public static function run()
-    {
         self::$master->run();
     }
 
@@ -302,7 +300,5 @@ Class loader{
     {
         return call_user_func_array(array(self::$master,$method),$arguments);
     }
-
-
+    
 }
-// loader::start($argc,$argv);
