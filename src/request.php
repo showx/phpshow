@@ -140,7 +140,12 @@ class request
             }
             self::$cookies = $_COOKIE;
         }
-        $path_info = $_SERVER['PATH_INFO'];
+        if(isset($_SERVER['PATH_INFO']))
+        {
+            $path_info = $_SERVER['PATH_INFO'];
+        }else{
+            $path_info = "";
+        }
         if(!empty($path_info))
         {
             $path_info = explode("/",trim($path_info,"/"));

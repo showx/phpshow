@@ -48,16 +48,16 @@ class response
     public static function code($type = "success")
     {
         $arr_type = [
-            'error' => '500',
+            'error' => 500,
             //Unauthorized
-            'unauth' => '401',
+            'unauth' => 401,
             //Forbidden
-            'forbidden' => '403',
+            'forbidden' => 403,
             //默认success
-            'success' => '200',
-            'notfound' => '404',
+            'success' => 200,
+            'notfound' => 404,
         ];
-        if(!isset($arr_type))
+        if(!isset($arr_type[$type]))
         {
             $type = "success";
         }

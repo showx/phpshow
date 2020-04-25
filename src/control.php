@@ -42,6 +42,7 @@ class control
             die('no access');
         }
     }
+
     /**
      * auth token验证
      */
@@ -62,13 +63,19 @@ class control
         }
         if($data == false)
         {
-            \phpshow\response::code("unauth");
-            echo \phpshow\response::toJson(['code'=>'-1','msg'=>'unauth']);
-            exit();
+            if($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
+            {
+                echo 'options';exit();
+            }else{
+                \phpshow\response::code("unauth");
+                echo \phpshow\response::toJson(['code'=>'-1','msg'=>'unauth']);
+                exit();
+            }
         }
         //可实时验证一下status
         $this->auth_data = $data;
     }
+    
     /**
      * 默认选择时间的范围
      */
