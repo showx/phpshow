@@ -8,10 +8,7 @@
 |_|         |_|
 ```
 # phpshow
-phpshow,轻量简单易用的php框架。
-
-# demo
-框架示例:[phpshow](https://github.com/showx/phpshow_demo "phpshow"). 
+phpshow,轻量简单易用的高性能php框架，默认启动workerman模式，抗大并发能力。
 
 # 服务器环境
 1. Nginx
@@ -37,6 +34,7 @@ phpshow 的开源协议为 Apache-2.0，详情参见[LICENSE](LICENSE)
 1.  short_open_tag = On  ;php短标记打开 <? ?>,模板要使用这样的标记
 
 ### nginx配置
+nginx正常模式
 ``` 
 server{
     ...
@@ -58,10 +56,16 @@ server{
 	...
 }
 ```
+高性能workerman模式
+```
+	location / {
+		proxy_pass http://127.0.0.1:8080;
+	    proxy_http_version 1.1;
+	    proxy_set_header X-Real-IP $remote_addrs;
+		
+	}
 
-### 不使用nginx也行
-默认的php守护进程
-
+```
 
 # 框架教程
 composer之后
@@ -81,19 +85,21 @@ composer之后
 放在app项目下的config文件夹
 
 ### 核心类的介绍
-
 1. \phpshow\request 获取数据类
 2. \phpshow\response 输出类
 3. \phpshow\loader 核心加载类
+4. \phpshow\control 基层控制器
+5. \phpshow\model	基层模型
 
-### 工具类
+### 工具库
 1. \phpshow\lib\redis redis类
 2. \phpshow\lib\http http请求类
 3. \phpshow\lib\mysql 数据库驱动
 4. \phpshow\lib\debug 页面调试
 5. \phpshow\lib\jwt jwt会话验证
 6. \phpshow\lib\log 日志类
-7. \phpshow\helper\util 辅助函数库
+7. \phpshow\lib\pool 进程池
+8. \phpshow\helper\util 辅助函数库
 
 ### 模型层
 继承\phpshow\model即可调用相关函数

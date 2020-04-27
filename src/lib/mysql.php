@@ -33,8 +33,6 @@ class mysql
         }
         $config = \phpshow\lib\config::get("db.mysql")[$conn];
         $this->conn = mysqli_connect($config['host'],$config['username'],$config['password'],$config['dbname'],$config['port']) or die('mysql connect error');
-//        mysqli_select_db($this->conn,$config['dbname']);
-//        $this->query(" use `{$dbname}`; ");
         if(empty($config['charset']))
         {
             $charset = 'utf-8';
@@ -87,7 +85,7 @@ class mysql
         // echo "mysql_time:".$lasttime.lr;
         if (!$result) {
             //调试模式才能显示
-            // if(\phpshow\lib\config::get('site.debug') == 0)
+            if(\phpshow\lib\config::get('site.debug') == 1)
             {
                 echo "sql_time:".$lasttime.lr;
                 $mysql_error = $sql.'Invalid query: ' . mysqli_error($this->conn);

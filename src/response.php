@@ -6,42 +6,66 @@
 namespace phpshow;
 class response
 {
-    public static $swObj = null;
+    public static $connection = null;
     public static $hander = null;
 
-    public static function setSw($response)
+    public static function setConnection($response)
     {
-        self::$swObj = $response;
+        self::$connection = $response;
     }
-    public static function init()
-    {
 
+    /**
+     * 向客服端输出内容
+     */
+    public static function send($result)
+    {
+        if(self::$connection)
+        {
+            self::$connection->send($result);
+        }else{
+            echo $result;
+        }
     }
+
+    /**
+     * 输出结尾
+     */
     public static function end($result)
     {
-        if(self::$swObj)
+        if(self::$connection)
         {
-            self::$swObj->end($result);
+            self::$connection->send($result);
         }else{
             echo $result;
         }
     }
+
+    /**
+     * 向客服端写入内容
+     */
     public static function write($result)
     {
-        if(self::$swObj)
+        if(self::$connection)
         {
-            self::$swObj->write($result);
+            self::$connection->write($result);
         }else{
             echo $result;
         }
     }
+
     /**
      * 输出头部信息
      */
-    public static function Header()
+    public static function Header($data = '')
     {
-        header('Content-Type: text/html; charset=utf-8');
+        if($data)
+        {
+            header($data);
+        }else{
+            header('Content-Type: text/html; charset=utf-8');
+        }
     }
+
     /**
      * 设置响应状态码
      */
@@ -92,9 +116,9 @@ class response
     {
         $result = self::returnArray($code,$msg,$data);
         $json_result = json_encode($result);
-        if(self::$swObj)
+        if(self::$connection)
         {
-            self::$swObj->end($json_result);
+            self::$connection->send($json_result);
         }else{
             echo $json_result;
         }
@@ -169,12 +193,7 @@ class response
         }
         $xml .= "</data>";
 
-        if(self::$swObj)
-        {
-            self::$swObj->end($xml);
-        }else{
-            echo $xml;
-        }
+        return $xml;
     }
 
     /**
