@@ -131,7 +131,17 @@ composer之后
     ├── header.php
     ├── index.php
 
-在app外composer require showx/phpshow
+
+新建composer.json文件
+```
+	autoload": {
+        "psr-4": {
+            "app\\": "app/"
+        }
+    },
+```
+增加本地项目的autoload
+composer require showx/phpshow
 在app里使用php index.php start启动服务器
 
 
