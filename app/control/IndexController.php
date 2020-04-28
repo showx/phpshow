@@ -14,6 +14,7 @@ class IndexController extends \phpshow\control
 {
     public function index($name='php',$name2='show')
     {
+        echo 'hello world'.lr;
         \phpshow\lib\tpl::display("index");
     }
 

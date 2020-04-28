@@ -258,6 +258,7 @@ Class show{
                 {
                     throw new \Exception('control1');
                 }
+                $ctl = new $ctl;
                 $this->bind($this->ct,$ctl);
             }
             $ctl = $this->make($this->ct);
@@ -266,7 +267,7 @@ Class show{
             {
                 $newctl = new $ctl;
                 call_user_func_array(array($newctl, $this->ac), $this->args );
-                $connection->send("test");
+                $connection->send("");
                 return true;
             } else {
                 throw new \Exception('fucking control..');
@@ -318,8 +319,7 @@ Class loader{
             {
                 //这里每秒检查一下crond的配置
                 \Workerman\Timer::add(1, function() use ($cron){
-                    // $cron->start();
-                    // echo "test crond \n";
+                    $cron->start();
                 });
             }
         };

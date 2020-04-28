@@ -44,6 +44,7 @@ class cron
             exit("Don't fuck!");
         }
     }
+
     /**
      * @desc 加载配置文件
      * 每次load时间都不一样
@@ -64,14 +65,11 @@ class cron
         //显示当前执行时间
         // $this->commander->help();
         $this->commander->Techo("green","===========crond:".date('Y-m-d H:i:s',$this->cur_time)."\n");
-        //config::get
-        $yaml = config::get("cron");
+        $cronConfig = config::get("cron");
         $this->runfile = [];
-        foreach($yaml as $ykey=>$yval)
+        foreach($cronConfig as $ykey=>$yval)
         {
-
             $kkey = explode(" ",$ykey);
-
             //检查是否需要运行的文件
             $run = true;
             $i=0;
@@ -94,87 +92,57 @@ class cron
             }
         }
     }
+
     /**
      * @desc 开始处理cron
     */
     public function start()
     {
         $this->loadConfig();
+        foreach($this->runfile as $key=>$val)
+        {
+            foreach($val as $kk=>$vv)
+            {
+                $this->run($vv);
+            }
+        }
         // //完全执行完所有队列
         $this->cur_time = time();
         $this->commander->Techo("green","[ALL FINISH]".date("Y-m-d H:i",$this->cur_time)."\r\n");
     }
+
     /**
      * @desc 运行文件,可考虑使用fork一个进程来执行
      * @param target_file 要运行的文件
      */
     public function run($target_file)
     {
-        $target_file = str_replace("+","/",$target_file);
+
+        $target_file = explode("/",$target_file);
         $this->cur_time = time();
-        //运行目标文件 并输出日志
-        if( file_exists($this->cron_path.'/'.$target_file) )
+        $ac = $target_file['1'];
+        if(!isset(\phpshow\loader::$master->bindings[$target_file['0']]))
         {
-            //输出开始时间信息
-            echo "======================".date('Y-m-d H:i ', $this->cur_time), "[START {$target_file} ]", "\r\n";
-            //运行
-            $this->start_time = microtime(true);
-            include $this->cron_path.'/'.$target_file;
-            $this->end_time = microtime(true);
-            $use_time = $this->end_time - $this->start_time;
-            //输出结束时间信息;
-            echo "\r\n";
-            echo "[FINISH {$target_file} ]","USE:",$use_time.")\r\n";
-        }
-        else
-        {
-            //输出错误信息
-            echo date('Y-m-d H:i ', $this->cur_time), "[MISS {$target_file} ]", "\r\n";
-        }
-    }
-
-    /**
-     * 列出目标文件夹里的文件
-     * @param 对应的文件夹
-     */
-    public function list_file($path = '')
-    {
-        $files = dir( $path );
-        $phpfile = array();
-        while( $file_name = $files->read() )
-        {
-            //php的执行
-            if( !preg_match('/\.php/', $file_name) )
+            $ctl = '';
+            $ctl1  = PS_APP_NAME."\\control\\".ucfirst($target_file['0']).'Controller';
+            if(class_exists($ctl1))
             {
-                continue;
+                $ctl = $ctl1;
             }
-            $phpfile[] = $file_name;
-
+            if(!empty($ctl))
+            {
+                $ctl = new $ctl;
+                \phpshow\loader::$master->bind($target_file['0'],$ctl);
+            }
         }
-        return $phpfile;
-
-    }
-    /**
-     * 运行目标文件
-     */
-    function run_target_file( $target_file = '' )
-    {
-        echo "----------------------------------------------------------------------------------------------------\r\n";
-        if( file_exists($this->cron_path.'/'.$target_file) )
+        $ctl = \phpshow\loader::$master->make($target_file['0']);
+        //强制运行在cli下的规则
+        if( method_exists ( $ctl, $target_file['1'] ) === true )
         {
-            //输出开始时间信息
-            echo date('Y-m-d H:i ', $this->cur_time), "[START {$target_file} ]", "\r\n";
-            //运行
-            include $this->cron_path.'/'.$target_file;
-            $use_time = microtime(true) - $this->start_time;
-            echo date('Y-m-d H:i ', $finish_time), "[FINISH {$target_file} ]", " USE: ", $use_time , " (", date('H:i', $start_time), "->", date('H:i', $finish_time), ")\r\n";
+            call_user_func_array([$ctl,$ac],[]);
+        }else{
+            $this->commander->Techo("green",date('Y-m-d H:i ', $this->cur_time), "[MISS {$target_file['0']}/{$target_file['1']} ]", "\r\n");
         }
-        else
-        {
-            //输出错误信息
-            echo date('Y-m-d H:i ', time()), "[缺少 {$target_file} 文件]", "\r\n";
-        }
-
     }
 
     /**

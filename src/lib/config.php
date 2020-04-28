@@ -32,7 +32,7 @@ Class config
             $file_exist2 = file_exists($file2);
             if($file_exist2)
             {
-                $file_arr2 = include $file2;
+                $file_arr2 = include_once $file2;
             }
             if($file_exist2)
             {

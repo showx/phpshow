@@ -52,7 +52,7 @@ class tpl
         $closure = function($file_name) use($result){
             extract($result);
             ob_start();
-            include self::include_file($file_name);
+            include_once self::include_file($file_name);
             $res = ob_get_contents();
             ob_end_clean();
             response::end($res);

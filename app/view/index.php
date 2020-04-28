@@ -1,4 +1,4 @@
 
-<?php include tpl_file("header");?>
+<?php include_once tpl_file("header");?>
 hello world!
-<?php include tpl_file("footer");?>
+<?php include_once tpl_file("footer");?>
