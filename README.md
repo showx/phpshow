@@ -108,6 +108,33 @@ composer之后
 配置文件主要饮食site(基础配置)database(数据库配置)route_rule(路由规则配置)
 放在app项目下的config文件夹
 
+## app项目
+├── config 配置目录
+│   ├── cron.php
+│   ├── db.php
+│   ├── signkey.php
+│   └── site.php
+├── control 控制类
+│   ├── IndexController.php
+├── index.php   程序入口
+├── model 模型类
+│   ├── IndexModel.php
+├── public 静态文件目录
+│   ├── favicon.ico
+│   ├── index.html
+│   ├── index.php   普通模式下的入口
+│   └── robots.txt
+├── runtime  临时缓存与日志目录
+│   └── Log
+└── view  模板目录
+    ├── footer.php
+    ├── header.php
+    ├── index.php
+
+在app外composer require showx/phpshow
+在app里使用php index.php start启动服务器
+
+
 ### 核心类的介绍
 1. \phpshow\request 获取数据类
 2. \phpshow\response 输出类
