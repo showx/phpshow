@@ -29,6 +29,30 @@ composer require showx/phpshow
 phpshow 的开源协议为 Apache-2.0，详情参见[LICENSE](LICENSE)
 
 ## php配置
+### 项目config/site.php配置
+详见参考事例
+
+```
+return [
+    //框架里的模式 [0普通启动|1 workerman模式];
+    'type' => 1,
+    // 绑定的地址
+    'host' => '0.0.0.0',
+	// 启动的端口
+    'port' => 8080,
+	//进程worker数量
+    'count' => 4,
+    //数据库池的数量
+    'mysql_pool_num' => 6,
+    //调试模式
+    'debug' => 1,
+    //开发模式 [dev 查看加载异常|dev2 查看接口使用内存等]
+    'dev' => 1,
+    'dev2' => 0,
+];
+```
+
+
 ### php.ini
 建议短标记
 1.  short_open_tag = On  ;php短标记打开 <? ?>,模板要使用这样的标记
