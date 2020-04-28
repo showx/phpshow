@@ -308,6 +308,22 @@ Class loader{
             self::$master->run();
             exit();
         }
+
+        $cronWorker = new \Workerman\Worker();
+        $cronWorker->count = 1;
+        $cronWorker->onWorkerStart = function($worker)
+        {
+            $cron = new \phpshow\lib\cron();
+            // if($worker->id === 0)
+            {
+                //这里每秒检查一下crond的配置
+                \Workerman\Timer::add(1, function() use ($cron){
+                    // $cron->start();
+                    // echo "test crond \n";
+                });
+            }
+        };
+
         $worker = new \Workerman\Worker("http://{$serviceHost}:{$servicePort}");
         $worker->count = $serverWorkerCount;
         $worker->onMessage = array(self::$master, 'run');

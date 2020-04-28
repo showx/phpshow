@@ -6,5 +6,5 @@
  */
 return [
     //会比普通crondjob多一位配置，精确到秒的意思
-    '01 * * * * *' => ['index/index'], 
+    '* * * * * *' => ['index/index'], 
 ];

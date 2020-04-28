@@ -12,4 +12,4 @@ use \phpshow\loader;
  * Date: 2018/7/19
  * Time: 下午11:41
  */
-loader::start($argc,$argv);
+loader::start();

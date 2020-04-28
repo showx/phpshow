@@ -7,10 +7,6 @@
  */
 
 namespace phpshow\lib;
-// //超过执行时间，关闭执行的cli
-ini_set('max_execution_time',0);
-//执行文本，不让超时
-set_time_limit(0);
 
 class cron
 {
@@ -35,13 +31,13 @@ class cron
     private $ftime = array("second"=>"s","min"=>"i","hour"=>"H","day"=>"d","week"=>"w","month"=>"m");
     //平均算法  例：分 */2 每两秒运行一次 填写不能超过60秒  
     private $ftime_dur = array("second"=>"60","min"=>"60","hour"=>"24","day"=>"1","week"=>"7","month"=>"30");
-    private $runfile = array();
+    private $runfile = [];
     private $commander;
     public function __construct()
     {
-        $this->commander = new \phpshow\lib\command();
-        $this->cron_path = PS_SYS_RUNTIME."/crond";
-        $this->cron_lock_path = PS_SYS_RUNTIME."/log/crond_queue";
+        $this->commander = new \phpshow\lib\console();
+        $this->cron_path = PS_RUNTIME."/crond";
+        $this->cron_lock_path = PS_RUNTIME."/log/crond_queue";
         // //只允许命令行模式运行这个脚本
         if( PHP_SAPI != 'cli' )
         {
@@ -66,26 +62,30 @@ class cron
             $this->ftime['week'] == "7";
         }
         //显示当前执行时间
-        $this->commander->help();
+        // $this->commander->help();
         $this->commander->Techo("green","===========crond:".date('Y-m-d H:i:s',$this->cur_time)."\n");
-        exit();
         //config::get
         $yaml = config::get("cron");
-
+        $this->runfile = [];
         foreach($yaml as $ykey=>$yval)
         {
+
+            $kkey = explode(" ",$ykey);
+
             //检查是否需要运行的文件
             $run = true;
+            $i=0;
             foreach($this->ftime as $fkey=>$fval)
             {
-                if($yval[$fkey] == '*')
+                if($kkey[$i] == '*')
                 {
                     //*任何时间检查下一项
                     continue;
-                }elseif($yval[$fkey] != $fval)
+                }elseif($kkey[$i] != $fval)
                 {
                     $run = false;
                 }
+                $i++;
             }
             if($run)
             {
@@ -99,80 +99,10 @@ class cron
     */
     public function start()
     {
-        // $pid = pcntl_fork();
-        // if( $pid < 0 ){
-        //   exit('fork error.');
-        // } else if( $pid > 0 ) {
-        //   // 主进程退出
-        //   exit();
-        // }
-        // if( !posix_setsid() ){
-        //     exit('setsid error.');
-        // }
-        // $pid = pcntl_fork();
-        // if( $pid  < 0 ){
-        // exit('fork error');
-        // } else if( $pid > 0 ) {
-        // // 主进程退出
-        // exit;
-        // }
-        // cli_set_process_title('phpshow_cron');
-        // //这里写个while
-        // while(true)
-        // {
-        //     pcntl_signal_dispatch();
-        //     sleep( 1 );
-        //     echo "phpshow_cron".date("Y-m-d H:i:s",time()).PHP_EOL;
-        // }
-
-
-
-
         $this->loadConfig();
-        // //运行
-        // if($this->runfile)
-        // {
-        //     foreach($this->runfile as $rkey=>$rval)
-        //     {
-        //         $rval['file'] = str_replace("/","+",$rval['file']);
-        //         //生成lock_file
-        //         if(!file_exists($this->cron_lock_path."/".$rval['file']))
-        //         {
-        //             file_put_contents($this->cron_lock_path."/".$rval['file'],"1");
-        //         }
-
-        //     }
-        // }
-        // //运行lock文件
-
-        // //filectime fileatime filemtime
-        // $lockfile = $this->list_file($this->cron_lock_path);
-        // foreach($lockfile as $lkey=>$lval)
-        // {
-        //     $ctime = filectime($this->cron_lock_path."/".$lval);
-        //     //超过五分钟的可疑。。要特殊处理
-        //     $lockname = str_replace(".php","_runlock",$lval);
-        //     $islock = file_exists($this->cron_lock_path."/".$lockname);
-        //     //有运行过的要人工查日志处理,超时可能运行过逻辑，再运行就有问题。
-        //     if($ctime+1200 < time() && $islock)
-        //     {
-        //         echo "[Warning]file:".$lval."\r\n";
-        //         continue;
-        //     }
-        //     //没锁代表没在运行了
-        //     if(!$islock)
-        //     {
-        //         file_put_contents($this->cron_lock_path."/".$lockname,"lock");
-        //         $this->run($lval);
-        //         //删除锁
-        //         unlink($this->cron_lock_path."/".$lval);
-        //         unlink($this->cron_lock_path."/".$lockname);
-        //     }
-        // }
-
         // //完全执行完所有队列
         $this->cur_time = time();
-        echo "[ALL FINISH]".date("Y-m-d H:i",$this->cur_time)."\r\n";
+        $this->commander->Techo("green","[ALL FINISH]".date("Y-m-d H:i",$this->cur_time)."\r\n");
     }
     /**
      * @desc 运行文件,可考虑使用fork一个进程来执行
