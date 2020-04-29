@@ -268,7 +268,10 @@ Class show{
                 $newctl = new $ctl;
                 call_user_func_array(array($newctl, $this->ac), $this->args );
                 //没发送，这里发送一下
-                $connection->send("");
+                if(!empty($connection))
+                {
+                    $connection->send("");
+                }
                 return true;
             } else {
                 throw new \Exception('fucking control..');
@@ -281,7 +284,10 @@ Class show{
                 // lookdata($e);
             }
             // $connection->send("- -!!");
-            $connection->send(new \Workerman\Protocols\Http\Response(404, [], "404!!!"));
+            if($this->config['type'] == '1')
+            {
+                $connection->send(new \Workerman\Protocols\Http\Response(404, [], "404!!!"));
+            }
             return false;
         }
     }

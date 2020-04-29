@@ -19,7 +19,7 @@ class mysql
     {
         $this->connect($conn);
     }
-
+    
     /**
      * 连接数据库
      */
@@ -30,15 +30,21 @@ class mysql
             $conn = "master";
         }
         $config = \phpshow\lib\config::get("db.mysql")[$conn];
-        $this->conn = mysqli_connect($config['host'],$config['username'],$config['password'],$config['dbname'],$config['port']) or die('mysql connect error');
         if(empty($config['charset']))
         {
-            $charset = 'utf-8';
+            $charset = 'utf8';
         }else{
             $charset = $config['charset'];
         }
-        mysqli_set_charset($this->conn,$charset);
-        return $this->conn;
+        $dsn    = 'mysql:dbname=' . $config['dbname'] . ';host=' .
+            $config["host"] . ';port=' . $config['port'];
+        $this->pdo = new \PDO($dsn, $config['username'], $config["password"],
+            array(
+                \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES ' . $charset
+            ));
+        $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $this->pdo->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
+        $this->pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
     }
 
     /**
@@ -49,8 +55,7 @@ class mysql
     public function query($sql)
     {
         $starttime = microtime(true);
-        // echo $sql.lr;
-        $result = mysqli_query($this->conn,$sql);
+        $result = $this->pdo->query($sql);
         $endtime = microtime(true);
         $lasttime = $endtime - $starttime;
         if($lasttime>$this->late_time)
@@ -62,36 +67,11 @@ class mysql
             //调试模式才能显示
             if(\phpshow\lib\config::get('site.debug') == 1)
             {
+                echo $sql.lr;
                 echo "sql_time:".$lasttime.lr;
-                $mysql_error = $sql.'Invalid query: ' . mysqli_error($this->conn);
-                echo $mysql_error.lr;
             }
         }
         return $result;
-    }
-
-    /**
-     * 数据fetch
-     * @param $result
-     * @param fetch_type [MYSQLI_NUM|MYSQLI_ASSOC|MYSQLI_BOTH]
-     */
-    public function fetch($result,$fetch_type = MYSQLI_ASSOC)
-    {
-        $data = [];
-        while($row=mysqli_fetch_array($result,$fetch_type)) {
-            $data[] = $row;
-        }
-        $this->free( $result );
-        return $data;
-    }
-
-    /**
-     * 释放集合
-     * @param $rs
-     */
-    public function free( $rs )
-    {
-        return mysqli_free_result( $rs );
     }
 
     /**
@@ -106,8 +86,7 @@ class mysql
             $sql = $sql." limit 1 ";
         }
         $result = $this->query($sql);
-        $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
-        $this->free($result);
+        $row = $result->fetch(\PDO::FETCH_ASSOC);
         return $row;
     }
 
@@ -117,7 +96,7 @@ class mysql
     public function get_all($sql)
     {
         $result = $this->query($sql);
-        $row = $this->fetch($result);
+        $row = $result->fetchAll(\PDO::FETCH_ASSOC);
         return $row;
     }
 
@@ -129,7 +108,7 @@ class mysql
     public function get_big_all($sql)
     {
         $result = $this->query($sql);
-        while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)) {
+        while($row=$result->fetch($result,\PDO::FETCH_ASSOC)) {
             yield $row;
         }
     }
@@ -140,7 +119,7 @@ class mysql
      */
     public function insert_id()
     {
-        return mysqli_insert_id($this->conn);
+        return $this->pdo->lastInsertId();
     }
 
 }
