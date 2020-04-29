@@ -1,28 +1,60 @@
 <?php
 namespace phpshow\lib;
 /**
- * 简单池
- * 可存放mysql与redis
- * 定时更新与删除池
+ * 简单的连接池实现
+ * 类型 mysql|redis
+ * 定时更新与释放
  * Author:show
  */
 class Pool
 {
-    protected $pool = [];
-
+    protected $pool;
+    public $type;
     /**
      * MysqlPool constructor.
      * @param int $size 连接池的尺寸
      */
-    function __construct($size = 20 , $type='mysql' ,$channel='')
+    function __construct($size = 20 , $type='mysql')
     {
-        $config = \phpshow\lib\config::get("db.mysql")['master'];
+        $this->type == $type;
+        $this->pool = new Class{
+            private $stack = [];
+            private $top = -1;
+            /**
+             * 入栈
+             */
+            public function push($data)
+            {
+                $this->top = ++$this->top;
+                $this->stack[$this->top] = $data;
+            }
+            /**
+             * 出栈
+             */
+            public function pop()
+            {
+                if($this->top == -1){
+                    return false;
+                }
+                $tmp = $this->stack[$this->top];
+                $this->top = --$this->top;
+                return $tmp;
+
+            }
+        };
+
         for ($i = 0; $i < $size; $i++)
         {
-            $mysql = new \phpshow\lib\mysql();
-            if($mysql)
+            if($type == 'mysql')
             {
-                $this->put($mysql);
+                $middle = new \phpshow\lib\mysql();
+            }elseif($type == 'redis')
+            {
+                $middle = new \phpshow\lib\redis();
+            }
+            if($middle)
+            {
+                $this->put($middle);
             }
         }
     }

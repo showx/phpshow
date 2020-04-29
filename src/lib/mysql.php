@@ -2,8 +2,6 @@
 /**
  * Created by PhpStorm.
  * User: pengyongsheng
- * @todo mysql主从
- * @todo 增加列存储infobright
  * Date: 2018/7/19
  * Time: 下午7:29
  */
@@ -44,28 +42,6 @@ class mysql
     }
 
     /**
-     * 安全过滤
-     * 注意参数安全
-     * @param $sql
-     * @return mixed
-     */
-    public function escapeParam($param)
-    {
-        //values addslashes的时候处理
-        $param = mysqli_real_escape_string($this->conn,$param);
-        return $param;
-    }
-    /**
-     * 安全检测
-     */
-    public function safe_string($sql)
-    {
-        $safe_array = array("load file","truncate","--");
-        $sql = str_replace($safe_array,"",$sql);
-        return $sql;
-    }
-
-    /**
      * 执行mysql处理
      * @param $sql
      * @return bool|\mysqli_result
@@ -73,7 +49,6 @@ class mysql
     public function query($sql)
     {
         $starttime = microtime(true);
-        // $sql = $this->safe_string($sql);
         // echo $sql.lr;
         $result = mysqli_query($this->conn,$sql);
         $endtime = microtime(true);
@@ -108,19 +83,6 @@ class mysql
         }
         $this->free( $result );
         return $data;
-    }
-
-    /**
-     * 检测mysql连接
-     */
-    public function ping(  )
-    {
-        if( $this->conn != null && !mysqli_ping( $this->conn ) )
-        {
-            mysqli_close( $this->conn );
-            $this->conn = null;
-            $this->connect();
-        }
     }
 
     /**
@@ -179,41 +141,6 @@ class mysql
     public function insert_id()
     {
         return mysqli_insert_id($this->conn);
-    }
-
-    /**
-     * 预处理方式处理
-     * @param $query
-     * @param array $args
-     * @return array|bool|\mysqli_result
-     */
-    public function prepare_query($query, array $args = [])
-    {
-        $result = false;
-        $stmt = mysqli_stmt_init($this->conn);
-        if(mysqli_stmt_prepare($stmt,$query))
-        {
-            $params = [];
-            $types  = array_reduce($args, function ($string, &$arg) use (&$params) {
-                $params[] = &$arg;
-                if (is_float($arg))         $string .= 'd';
-                elseif (is_integer($arg))   $string .= 'i';
-                elseif (is_string($arg))    $string .= 's';
-                else                        $string .= 'b';
-                return $string;
-            }, '');
-            if($params && $types)
-            {
-                mysqli_stmt_bind_param($stmt,$types,...$params);
-            }
-            $execute = mysqli_stmt_execute($stmt);
-            if($execute)
-            {
-                $result = mysqli_stmt_get_result($stmt);
-            }
-            mysqli_stmt_close($stmt);
-        }
-        return $result;
     }
 
 }

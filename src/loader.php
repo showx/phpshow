@@ -267,6 +267,7 @@ Class show{
             {
                 $newctl = new $ctl;
                 call_user_func_array(array($newctl, $this->ac), $this->args );
+                //没发送，这里发送一下
                 $connection->send("");
                 return true;
             } else {
@@ -310,20 +311,22 @@ Class loader{
             exit();
         }
 
-        $cronWorker = new \Workerman\Worker();
-        $cronWorker->count = 1;
-        $cronWorker->onWorkerStart = function($worker)
+        if($frameconfig['cronjob'] == 1)
         {
-            $cron = new \phpshow\lib\cron();
-            // if($worker->id === 0)
+            $cronWorker = new \Workerman\Worker();
+            $cronWorker->count = 1;
+            $cronWorker->onWorkerStart = function($worker)
             {
-                //这里每秒检查一下crond的配置
-                \Workerman\Timer::add(1, function() use ($cron){
-                    $cron->start();
-                });
-            }
-        };
-
+                $cron = new \phpshow\lib\cron();
+                // if($worker->id === 0)
+                {
+                    //这里每秒检查一下crond的配置
+                    \Workerman\Timer::add(1, function() use ($cron){
+                        $cron->start();
+                    });
+                }
+            };
+        }
         $worker = new \Workerman\Worker("http://{$serviceHost}:{$servicePort}");
         $worker->count = $serverWorkerCount;
         $worker->onMessage = array(self::$master, 'run');

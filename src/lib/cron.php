@@ -64,7 +64,7 @@ class cron
         }
         //显示当前执行时间
         // $this->commander->help();
-        $this->commander->Techo("green","===========crond:".date('Y-m-d H:i:s',$this->cur_time)."\n");
+        // $this->commander->Techo("green","===========crond:".date('Y-m-d H:i:s',$this->cur_time)."\n");
         $cronConfig = config::get("cron");
         $this->runfile = [];
         foreach($cronConfig as $ykey=>$yval)
@@ -75,6 +75,8 @@ class cron
             $i=0;
             foreach($this->ftime as $fkey=>$fval)
             {
+
+                // echo $kkey[$i]."|".$fval.lr;
                 if($kkey[$i] == '*')
                 {
                     //*任何时间检查下一项
@@ -108,7 +110,7 @@ class cron
         }
         // //完全执行完所有队列
         $this->cur_time = time();
-        $this->commander->Techo("green","[ALL FINISH]".date("Y-m-d H:i",$this->cur_time)."\r\n");
+        // $this->commander->Techo("green","[ALL FINISH]".date("Y-m-d H:i",$this->cur_time)."\r\n");
     }
 
     /**

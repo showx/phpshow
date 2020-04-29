@@ -18,12 +18,10 @@ class ip
     public function __construct()
     {
         //增加
-        // $path = './17monipdb.datx';
         $path = PS_PATH.'/lib/17monipdb.datx';
         $this->file = fopen($path, 'rb');
         $this->offset = unpack('Nlen', fread($this->file, 4));
         $this->index = fread($this->file, $this->offset['len'] - 4);
-        // var_dump($this->index);
     }
     /**
      * @param string $ip
