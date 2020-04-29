@@ -82,12 +82,14 @@ server{
 ```
 高性能workerman模式
 ```
+server {
+	server_name xxx.com
 	location / {
-		proxy_pass http://127.0.0.1:8080;
+		proxy_pass http://172.20.0.3:8080;
 	    proxy_http_version 1.1;
-	    proxy_set_header X-Real-IP $remote_addrs;
-		
+	    proxy_set_header X-Real-IP $remote_addr;
 	}
+}
 
 ```
 
