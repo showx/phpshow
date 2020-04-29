@@ -1250,7 +1250,7 @@ class Medoo
 		return $stack;
 	}
 
-	public function insert($table, $datas)
+	public function insert($table='', $datas='')
 	{
 		$stack = [];
 		$columns = [];

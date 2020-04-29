@@ -26,6 +26,8 @@ class request
     //严禁保存的文件名
     public static $filter_filename = '/\.(php|pl|sh|js)$/i';
 
+    public static $request;
+
    /**
     * 初始化用户请求
     * 对于 post、get 的数据，会转到 selfforms 数组， 并删除原来数组
@@ -43,6 +45,8 @@ class request
         //_POST 变量
         self::$posts = array();
 
+        self::$request = $request;
+
         $magic_quotes_gpc = ini_get('magic_quotes_gpc');
         $request_arr = [];
         if($request)
@@ -56,11 +60,11 @@ class request
             {
                 $_COOKIE = $request->cookie();
             }
-            self::$request_mdthod = '';
-            if($request->method == 'GET')
+            self::$request_mdthod = $request->method();
+            if($request->method() == 'GET')
             {
                 $request_arr = $request->get();
-            }elseif($request->method == 'POST'){
+            }elseif($request->method() == 'POST'){
                 $request_arr = $request->post();
             }
             $requestpath = $request->path();
@@ -226,7 +230,18 @@ class request
      */
     public static function postjson()
     {
-        $tmp = file_get_contents("php://input");
+        $tmp = false;
+        if(!empty(self::$request))
+        {
+            foreach(self::$request->post() as $kk=>$vv)
+            {
+                $tmp = $kk;
+                break;
+            }
+        }else{
+            $tmp = file_get_contents("php://input");
+            
+        }
         if($tmp)
         {
             $tmp = json_decode($tmp,true);

@@ -54,7 +54,6 @@ class model extends Medoo
             'port' => 3306,
         ];
         parent::__construct($options);
-        
     }
 
     public function create()

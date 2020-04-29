@@ -1,9 +1,9 @@
 <?php
 namespace app\control;
 
-use app\model\user1Model;
+use app\model\UserModel;
 use \phpshow\request;
-use \phpshow\lib\redis;
+
 /**
  * Created by PhpStorm.
  * User: showx

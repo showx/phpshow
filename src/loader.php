@@ -213,6 +213,9 @@ Class show{
             // echo $request_count.lr;
             \phpshow\response::setConnection($connection);
             $localfile = PS_APP_PATH."/public".$request->path();
+            // var_dump($request->get());
+            // var_dump($request->post());
+            // echo $localfile.lr;
             if (is_file($localfile)) {
     
                 $file_info = pathinfo($localfile);
@@ -280,7 +283,9 @@ Class show{
         {
             if($this->config['dev'] == '1')
             {
-                echo "error:".$e->getMessage().$this->ct."|".$this->ac.lr;
+                echo "error:".$e->getMessage()." ".$this->ct."|".$this->ac.lr;
+                echo $e->getLine().lr;
+                echo $e->getFile().lr;
                 // lookdata($e);
             }
             // $connection->send("- -!!");

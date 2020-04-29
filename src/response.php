@@ -8,10 +8,22 @@ class response
 {
     public static $connection = null;
     public static $hander = null;
-
+    public static $cors = [];
     public static function setConnection($response)
     {
         self::$connection = $response;
+    }
+
+    /**
+     * cors跨域请求
+     */
+    public static function setCors($host = '*')
+    {
+        self::$cors = [
+            'Access-Control-Allow-Origin' => $host,
+            'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers' => '*',
+        ];
     }
 
     /**
@@ -21,7 +33,7 @@ class response
     {
         if(self::$connection)
         {
-            self::$connection->send($result);
+            self::$connection->send(new \Workerman\Protocols\Http\Response(200, self::$cors, $result));
         }else{
             echo $result;
         }
@@ -34,7 +46,7 @@ class response
     {
         if(self::$connection)
         {
-            self::$connection->send($result);
+            self::$connection->send(new \Workerman\Protocols\Http\Response(200, self::$cors, $result));
         }else{
             echo $result;
         }
@@ -110,6 +122,19 @@ class response
     }
     
     /**
+     * json返回
+     */
+    public static function toJson($result)
+    {
+        if(self::$connection)
+        {
+            self::$connection->send(new \Workerman\Protocols\Http\Response(200, self::$cors, json_encode($result)));
+        }else{
+            echo json_encode($result);
+        }
+    }
+
+    /**
      * 输出json
      */
     public static function json($code=0,$msg='',$data='')
@@ -137,13 +162,7 @@ class response
         return json_encode($result);
 
     }
-    /**
-     * json返回
-     */
-    public static function toJson($result)
-    {
-        echo json_encode($result);
-    }
+    
     /**
      * 通用返回
      */

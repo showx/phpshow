@@ -63,17 +63,18 @@ class control
         }
         if($data == false)
         {
-            if($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
+            if(\phpshow\request::$request_mdthod == 'OPTIONS')
             {
-                echo 'options';exit();
+                echo 'options';return false;
             }else{
                 \phpshow\response::code("unauth");
                 echo \phpshow\response::toJson(['code'=>'-1','msg'=>'unauth']);
-                exit();
+                return false;
             }
         }
         //可实时验证一下status
         $this->auth_data = $data;
+        return true;
     }
     
     /**
