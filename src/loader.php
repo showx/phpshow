@@ -277,11 +277,12 @@ Class show{
         {
             if($this->config['dev'] == '1')
             {
-                // var_dump($this->ct);
-                // var_dump($this->ac);
-                echo "error:".$e->getMessage().lr;
+                echo "error:".$e->getMessage().$this->ct."|".$this->ac.lr;
                 // lookdata($e);
             }
+            // $connection->send("- -!!");
+            $connection->send(new \Workerman\Protocols\Http\Response(404, [], "404!!!"));
+            return false;
         }
     }
 }
