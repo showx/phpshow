@@ -27,45 +27,6 @@ class response
     }
 
     /**
-     * 向客服端输出内容
-     */
-    public static function send($result)
-    {
-        if(self::$connection)
-        {
-            self::$connection->send(new \Workerman\Protocols\Http\Response(200, self::$cors, $result));
-        }else{
-            echo $result;
-        }
-    }
-
-    /**
-     * 输出结尾
-     */
-    public static function end($result)
-    {
-        if(self::$connection)
-        {
-            self::$connection->send(new \Workerman\Protocols\Http\Response(200, self::$cors, $result));
-        }else{
-            echo $result;
-        }
-    }
-
-    /**
-     * 向客服端写入内容
-     */
-    public static function write($result)
-    {
-        if(self::$connection)
-        {
-            self::$connection->write($result);
-        }else{
-            echo $result;
-        }
-    }
-
-    /**
      * 输出头部信息
      */
     public static function Header($data = '')
@@ -120,15 +81,32 @@ class response
         header('Pragma:no-cache');
         header("Expires:0");
     }
+
+    /**
+     * 向客服端输出内容
+     */
+    public static function send($result)
+    {
+        // echo "send:".lr;
+        // var_dump($result);
+        if(self::$connection)
+        {
+            self::$connection->send(new \Workerman\Protocols\Http\Response(200, self::$cors, $result));
+        }else{
+            echo $result;
+        }
+    }
     
     /**
      * json返回
      */
-    public static function toJson($result)
+    public static function toJson($result,$http_code = 200)
     {
+        // echo "toJson:".lr;
+        // var_dump($result);
         if(self::$connection)
         {
-            self::$connection->send(new \Workerman\Protocols\Http\Response(200, self::$cors, json_encode($result)));
+            self::$connection->send(new \Workerman\Protocols\Http\Response($http_code, self::$cors, json_encode($result)));
         }else{
             echo json_encode($result);
         }
@@ -139,13 +117,14 @@ class response
      */
     public static function json($code=0,$msg='',$data='')
     {
+        // echo "json:".lr;
+        // var_dump($data);
         $result = self::returnArray($code,$msg,$data);
-        $json_result = json_encode($result);
         if(self::$connection)
         {
-            self::$connection->send($json_result);
+            self::$connection->send(new \Workerman\Protocols\Http\Response(200, self::$cors, json_encode($result)));
         }else{
-            echo $json_result;
+            echo json_encode($result);
         }
 
     }
@@ -161,6 +140,32 @@ class response
         $result = self::returnArray($code,$msg,$data);
         return json_encode($result);
 
+    }
+
+    /**
+     * 输出结尾
+     */
+    public static function end($result)
+    {
+        if(self::$connection)
+        {
+            self::$connection->send(new \Workerman\Protocols\Http\Response(200, self::$cors, $result));
+        }else{
+            echo $result;
+        }
+    }
+
+    /**
+     * 向客服端写入内容
+     */
+    public static function write($result)
+    {
+        if(self::$connection)
+        {
+            self::$connection->write($result);
+        }else{
+            echo $result;
+        }
     }
     
     /**

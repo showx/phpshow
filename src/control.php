@@ -26,14 +26,17 @@ class control
     public $date_type_range = ['1'=>'0','2'=>'1','7'=>'7','8'=>'30'];
     public function __construct()
     {
+
+        if(\phpshow\request::$request_mdthod == 'OPTIONS')
+        {
+            \phpshow\response::send("1");
+            return false;
+        }
+
+
         if($this->auth_token_page == 1)
         {
             $this->authtoken();
-        }
-
-        if( PHP_SAPI == 'cli' )
-        {
-            // $this->commander = new \phpshow\lib\command();
         }
 
         $this->is_ajax = $this->is_ajax();
@@ -48,16 +51,23 @@ class control
      */
     public function authtoken($authorization = '')
     {
+        $this->auth_data = [];
         //HTTP_X_TOKEN
         if(isset($_SERVER['HTTP_AUTHORIZATION']))
         {
             $authorization = $_SERVER['HTTP_AUTHORIZATION'];
+        }else{
+            if(isset(\phpshow\request::$header['authorization']))
+            {
+                $authorization = \phpshow\request::$header['authorization'];
+            }
         }
         if(!empty($authorization))
         {
             $jwt = new \phpshow\lib\jwt();
             //验证authorization
             $data = $jwt->decode($authorization);
+            
         }else{
             $data = false;
         }
@@ -65,16 +75,17 @@ class control
         {
             if(\phpshow\request::$request_mdthod == 'OPTIONS')
             {
-                echo 'options';return false;
+                echo 'options'.lr;
+                return false;
             }else{
                 \phpshow\response::code("unauth");
-                echo \phpshow\response::toJson(['code'=>'-1','msg'=>'unauth']);
+                \phpshow\response::toJson(['code'=>'-1','msg'=>'unauth']);
                 return false;
             }
         }
         //可实时验证一下status
         $this->auth_data = $data;
-        return true;
+        return $data;
     }
     
     /**

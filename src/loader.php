@@ -213,14 +213,15 @@ Class show{
             // echo $request_count.lr;
             \phpshow\response::setConnection($connection);
             $localfile = PS_APP_PATH."/public".$request->path();
-            // var_dump($request->get());
+            // echo 'run:'.lr;
+            // var_dump($request->header());
             // var_dump($request->post());
             // echo $localfile.lr;
+            // start 判断是否静态资源
             if (is_file($localfile)) {
     
                 $file_info = pathinfo($localfile);
                 $extension = $file_info['extension'] ?? '';
-    
                 $mimeType = $this->mime[$extension] ?? '';
                 if(empty($mimeType))
                 {
@@ -239,9 +240,12 @@ Class show{
                 $connection->send($response);
                 return true;
             }
+            // end 静态资源加载
             request::init($request);
             $this->miniroute();
         }
+        // echo "ct:".\phpshow\loader::$master->ct.lr;
+        // echo "ac:".\phpshow\loader::$master->ac.lr;
         
         \phpshow\lib\tpl::$tpl_result = [];
         try{

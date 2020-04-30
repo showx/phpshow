@@ -101,16 +101,29 @@ class model extends Medoo
      */
     public function get_all($where = [])
     {
-        $limit = [($this->page-1)*$this->limit,$this->limit];
+        $limit = [($this->page-1) * $this->limit,$this->limit];
         $where['LIMIT'] = $limit;
         return parent::select($this->table_name,$this->fields,$where);
+    }
+
+    /**
+     * 列出列表
+     */
+    public function list($where = [])
+    {
+        $data = $this->get_all($where);
+        $total = $this->count($this->table_name,$where);
+        return [
+            'list' => $data,
+            'total' => $total
+        ];
     }
 
     /**
      * 插入新数据
      * @param $attrs
      */
-    public function insert($attrs = '')
+    public function insert1($attrs = '')
     {
 
         if(empty($attrs) && !empty($this->attr) )
@@ -135,7 +148,7 @@ class model extends Medoo
      * 更新数据
      * @param $attrs
      */
-    public function update($attrs,$where){
+    public function update1($attrs,$where){
         //这个里where
         $data = parent::update($this->table_name,$attrs,$where);
         return  $data->rowCount();
@@ -146,7 +159,7 @@ class model extends Medoo
      * 只针对id处理
      * @param $id
      */
-    public function delete($id){
+    public function delete1($id){
         parent::delete($this->table_name,['id'=>$id]);
     }
 

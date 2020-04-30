@@ -18,6 +18,8 @@ class request
     //_POST 变量
     public static $posts = array();
 
+    public static $header = [];
+
     public static $pinfos = [];
 
     //用户的请求模式 GET 或 POST
@@ -56,6 +58,8 @@ class request
             {
                 return false;
             }
+            self::$header = $request->header();
+
             if($request->cookie())
             {
                 $_COOKIE = $request->cookie();
@@ -284,6 +288,11 @@ class request
             $value = $defaultvalue;
         }
         return $value;
+    }
+
+    public static function setRequest($request)
+    {
+        static::$request = $request;
     }
     
 }
