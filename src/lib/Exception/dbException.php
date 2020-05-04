@@ -8,6 +8,7 @@ Class dbException extends \Exception
 {
     private $errorCode;
     private $sql;
+
     /**
      * 初始化异常
      */
@@ -17,6 +18,7 @@ Class dbException extends \Exception
         $this->errorCode = $code;
         $this->sql = $sql;
     }
+
     /**
      *  获取错误码
      */
@@ -24,6 +26,7 @@ Class dbException extends \Exception
     {
         return $this->errorCode;
     }
+
     /**
      * 获取错误的sql语句
      */
@@ -31,6 +34,7 @@ Class dbException extends \Exception
     {
         return $this->sql;
     }
+
     /**
      * 格式化输出异常码，异常信息，请求id
      * @return string
@@ -39,7 +43,7 @@ Class dbException extends \Exception
     {
         return "[".__CLASS__."]"." code:".$this->errorCode.
             " message:".$this->getMessage().
-            " sql:".$this->sql;
+            " sql:".$this->sql.lr;
     }
 
 }

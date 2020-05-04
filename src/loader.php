@@ -288,8 +288,8 @@ Class show{
             if($this->config['dev'] == '1')
             {
                 echo "error:".$e->getMessage()." ".$this->ct."|".$this->ac.lr;
-                echo $e->getLine().lr;
-                echo $e->getFile().lr;
+                echo "error_file_line".$e->getLine().lr;
+                echo "error_file:".$e->getFile().lr;
                 // lookdata($e);
             }
             // $connection->send("- -!!");

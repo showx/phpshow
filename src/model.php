@@ -89,6 +89,24 @@ class model extends Medoo
     }
 
     /**
+     * 获取指定sql一条数据
+     */
+    public function get_sql_one($sql)
+    {
+        $data = $this->query($sql)->fetch();
+        return $data;
+    }
+
+    /**
+     * 获取指定sql所有数据
+     */
+    public function get_sql_all($sql)
+    {
+        $data = $this->query($sql)->fetchAll();
+        return $data;
+    }
+
+    /**
      * get_one
      */
     public function get_one($where = [])
@@ -161,6 +179,27 @@ class model extends Medoo
      */
     public function delete1($id){
         parent::delete($this->table_name,['id'=>$id]);
+    }
+
+    /**
+     * 解释排序字段
+     * game_id|ascend  字段|升降  ascend descend
+     */
+    public function orderfield($sort_field = '')
+    {
+        $sort_field = explode("_",$sort_field);
+        if(empty($sort_field) || !isset($sort_field['1']))
+        {
+            return '';
+        }
+        if($sort_field['1'] == 'ascend')
+        {
+            $sort_type = 'ASC';
+        }else{
+            $sort_type = 'DESC';
+        }
+        $order[$sort_field['0']] = $sort_type;
+        return $order;
     }
 
 }

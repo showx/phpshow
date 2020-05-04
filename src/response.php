@@ -130,6 +130,22 @@ class response
     }
 
     /**
+     * 返回状态给客服端
+     */
+    public static function returnStatus($code = 20000)
+    {
+        $response = [];
+        if($code == 20000)
+        {
+            $response['data'] = 'success';
+        }else{
+            $response['data'] = 'error';
+        }
+        $response['code'] = $code;
+        \phpshow\response::toJson($response);
+    }
+
+    /**
      * 返回json
      * @param string $code
      * @param string $msg

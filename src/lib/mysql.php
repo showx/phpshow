@@ -8,7 +8,8 @@
 
 namespace phpshow\lib;
 
-
+use Exception;
+use \phpshow\lib\Exception\dbException;
 class mysql
 {
     //数据库链接
@@ -50,25 +51,37 @@ class mysql
     /**
      * 执行mysql处理
      * @param $sql
-     * @return bool|\mysqli_result
      */
     public function query($sql)
     {
-        $starttime = microtime(true);
-        $result = $this->pdo->query($sql);
-        $endtime = microtime(true);
-        $lasttime = $endtime - $starttime;
-        if($lasttime>$this->late_time)
+        $result = '';
+        try{
+            $starttime = microtime(true);
+            $result = false;
+            try{
+                $result = $this->pdo->query($sql);
+            }catch(Exception $e)
+            {
+                $message = $e->getMessage();
+                throw new dbException(1,$message,$sql);
+            }
+            $endtime = microtime(true);
+            $lasttime = $endtime - $starttime;
+            if (!$result) {
+                //调试模式才能显示 查看语句的时效
+                if(\phpshow\lib\config::get('site.debug') == 1)
+                {
+                    echo $sql.lr;
+                    echo "sql_time:".$lasttime.lr;
+                }
+            }
+            return $result;
+        }catch(dbException $e)
         {
-            //慢查询，保存到sql日志文件
-        }
-        // echo "mysql_time:".$lasttime.lr;
-        if (!$result) {
-            //调试模式才能显示
             if(\phpshow\lib\config::get('site.debug') == 1)
             {
-                echo $sql.lr;
-                echo "sql_time:".$lasttime.lr;
+                echo $e;
+                // echo $e->getSql();
             }
         }
         return $result;
@@ -86,7 +99,10 @@ class mysql
             $sql = $sql." limit 1 ";
         }
         $result = $this->query($sql);
-        $row = $result->fetch(\PDO::FETCH_ASSOC);
+        if($result)
+        {
+            $row = $result->fetch(\PDO::FETCH_ASSOC);
+        }
         return $row;
     }
 
@@ -96,7 +112,10 @@ class mysql
     public function get_all($sql)
     {
         $result = $this->query($sql);
-        $row = $result->fetchAll(\PDO::FETCH_ASSOC);
+        if($result)
+        {
+            $row = $result->fetchAll(\PDO::FETCH_ASSOC);
+        }
         return $row;
     }
 
