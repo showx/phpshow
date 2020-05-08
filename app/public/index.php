@@ -1,7 +1,5 @@
 <?php
 /**
- * 程序入口
- * nginx解释到这
- * Author:show
+ * 普通模式下的入口
  */
-require dirname(__FILE__) . "/../index.php";
+require_once(dirname(__FILE__)."/../index.php");

@@ -63,7 +63,7 @@ Class show{
         {
             //发生错误的记录
             set_error_handler(array('\phpshow\lib\debug','handler_debug_error'), E_ALL);
-            //页面结束调用
+            //页面结束调用 , type为1的时候作用不大
             register_shutdown_function(array($this, 'end'));
         }
         // $this->init();
