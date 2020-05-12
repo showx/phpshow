@@ -237,11 +237,14 @@ class request
         $tmp = false;
         if(!empty(self::$request))
         {
-            foreach(self::$request->post() as $kk=>$vv)
-            {
-                $tmp = $kk;
-                break;
-            }
+            // var_dump($GLOBALS['HTTP_RAW_POST_DATA']);
+            // var_dump(self::$request->post());
+            $tmp = self::$request->rawBody();
+            // foreach(self::$request->post() as $kk=>$vv)
+            // {
+            //     $tmp = $kk;
+            //     break;
+            // }
         }else{
             $tmp = file_get_contents("php://input");
             

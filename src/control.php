@@ -75,7 +75,7 @@ class control
         {
             if(\phpshow\request::$request_mdthod == 'OPTIONS')
             {
-                echo 'options'.lr;
+                // echo 'options'.lr;
                 return false;
             }else{
                 \phpshow\response::code("unauth");
