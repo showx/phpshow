@@ -93,7 +93,7 @@ class model extends Medoo
      */
     public function get_sql_one($sql)
     {
-        $data = $this->query($sql)->fetch();
+        $data = $this->query($sql)->fetch(\PDO::FETCH_ASSOC);
         return $data;
     }
 
@@ -102,7 +102,7 @@ class model extends Medoo
      */
     public function get_sql_all($sql)
     {
-        $data = $this->query($sql)->fetchAll();
+        $data = $this->query($sql)->fetchAll(\PDO::FETCH_ASSOC);
         return $data;
     }
 
