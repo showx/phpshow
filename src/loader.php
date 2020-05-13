@@ -326,7 +326,9 @@ Class loader{
             self::$master->run();
             exit();
         }
-
+        //每次运行框架的日期
+        $nowdate = date("Ymd",time());
+        \Workerman\Worker::$stdoutFile = PS_RUNTIME."/log/warning".$nowdate.".log";
         if($frameconfig['cronjob'] == 1)
         {
             $cronWorker = new \Workerman\Worker();
