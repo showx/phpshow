@@ -51,7 +51,7 @@ class model extends Medoo
             'username' => $config['username'],
             'password' => $config['password'],
             'charset' => 'utf8',
-            'port' => 3306,
+            'port' => $config['port'],
         ];
         parent::__construct($options);
     }
