@@ -166,10 +166,12 @@ composer require showx/phpshow
 
 ### 模型层
 继承\phpshow\model即可调用相关函数
-1. insert 新增数据
-2. update 更新数据
+1. insert1 新增数据
+2. update1 更新数据
 3. get_one 获取一条数据
 4. get_all 获取所有数据
+5. get_sql_one 获取指定sql的一条数据
+6. get_sql_all 获取指定sql的全部数据
 
 ### 模板引擎
 使用纯php输出，模板里简单用<? ?> 作为标签
