@@ -29,7 +29,7 @@ class control
 
         if(\phpshow\request::$request_mdthod == 'OPTIONS')
         {
-            \phpshow\response::send("1");
+            \phpshow\response::send("");
             return false;
         }
 
