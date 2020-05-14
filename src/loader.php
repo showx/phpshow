@@ -232,7 +232,7 @@ Class show{
                 readfile($localfile);
                 $content = ob_get_clean();
                 $response = new \Workerman\Protocols\Http\Response(200, [
-                    'Content-Type' => 'text/html',
+                    // 'Content-Type' => 'text/html',
                     'Content-Type' => $mimeType,
                     'Content-Length' => filesize($localfile)
                 ], $content);
@@ -277,7 +277,8 @@ Class show{
                 //没发送，这里发送一下
                 if(!empty($connection))
                 {
-                    $connection->send("");
+                    // 没什么事不要另外再发送一下
+                    // $connection->send("");
                 }
                 return true;
             } else {

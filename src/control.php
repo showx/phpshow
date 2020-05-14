@@ -76,6 +76,7 @@ class control
             if(\phpshow\request::$request_mdthod == 'OPTIONS')
             {
                 // echo 'options'.lr;
+                \phpshow\response::toJson(['cors'=>'options']);
                 return false;
             }else{
                 \phpshow\response::code("unauth");
