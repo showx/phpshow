@@ -330,8 +330,6 @@ Class loader{
         //每次运行框架的日期
         $nowdate = date("Ymd",time());
         \Workerman\Worker::$stdoutFile = PS_RUNTIME."/log/warning".$nowdate.".log";
-        // php进程用户
-        \Workerman\Worker::$user = "www-data";
         if($frameconfig['cronjob'] == 1)
         {
             $cronWorker = new \Workerman\Worker();
@@ -349,6 +347,8 @@ Class loader{
             };
         }
         $worker = new \Workerman\Worker("http://{$serviceHost}:{$servicePort}");
+        // php进程用户
+        $worker->user = 'www-data';
         $worker->count = $serverWorkerCount;
         $worker->onMessage = array(self::$master, 'run');
         \Workerman\Worker::runAll();
