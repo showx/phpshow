@@ -80,7 +80,7 @@ class control
                 return false;
             }else{
                 \phpshow\response::code("unauth");
-                \phpshow\response::toJson(['code'=>'-1','msg'=>'unauth']);
+                \phpshow\response::toJson(['code'=>'-1','msg'=>'unauth'],401);
                 return false;
             }
         }
