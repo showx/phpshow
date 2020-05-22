@@ -111,6 +111,7 @@ composer之后
 放在app项目下的config文件夹
 
 ## app项目
+```
 ├── config 配置目录
 │   ├── cron.php
 │   ├── db.php
@@ -132,6 +133,7 @@ composer之后
     ├── footer.php
     ├── header.php
     ├── index.php
+```
 
 
 新建composer.json文件
