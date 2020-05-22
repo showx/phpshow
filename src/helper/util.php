@@ -49,6 +49,13 @@ class util
             $client_ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
         }
         preg_match("/[\d\.]{7,15}/", $client_ip, $onlineip);
+        if(empty($onlineip[0]))
+        {
+            if(isset(\phpshow\request::$header['x-real-ip']))
+            {
+                $onlineip[0] = \phpshow\request::$header['x-real-ip'];
+            }
+        }
         $client_ip = ! empty($onlineip[0]) ? $onlineip[0] : '0.0.0.0';
         self::$client_ip = $client_ip;
         return $client_ip;
