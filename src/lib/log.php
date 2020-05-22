@@ -12,28 +12,52 @@ namespace phpshow\lib;
 
 class log
 {
-    //默认使用seaslog作为写入日志
+    //默认使用seaslog作为写入日志 [1 seaslong |2 file_put_contents]
     public $type = 2;
+    //日志类型
     public $log_type = array("debug"=>1,"info"=>2,"notice"=>3,"error"=>4,"critical"=>5,"emergency"=>6);
+    //日志起始地址
+    private $pathRoot = '';
+    //日志地址
     private $path = '';
-    public function __construct($default_dir='')
+    //日志目录类型
+    public $default_dir_type = 'date';
+    public function __construct($default_dir='' ,$type = '')
     {
-        if (!extension_loaded('seaslog'))
+        if($type == 2)
         {
-            $this->type = 1;
-        }else{
             $this->type = 2;
+        }else{
+            if (!extension_loaded('seaslog'))
+            {
+                $this->type = 1;
+            }else{
+                $this->type = 2;
+            }
         }
+        //记录日志地址
         $this->setLogPath(PS_RUNTIME.'/log/');
-        //这里一定要有个地址
+        //二级日志地址
         if(empty($default_dir))
         {
-            $default_dir = date("Ymd");
+            $this->default_dir_type = 'date';
+        }else{
+            $this->default_dir_type = $default_dir;
         }
-        $this->setLogDirName($default_dir);
     }
+
+    /**
+     * 操作的动作
+     */
     public function _action($data,$type='info')
     {
+        if($this->default_dir_type == 'date')
+        {
+            $default_dir = date("Ymd");
+            $this->setLogDirName($default_dir);
+        }else{
+            $this->setLogDirName($this->default_dir_type);
+        }
         if(!isset($this->log_type[strtolower($type)]))
         {
             return false;
@@ -45,10 +69,13 @@ class log
             $date = date("YmdH");
             $time = time();
             $log = "[{$type}]".$data." time:{$time}\n";
-            // echo $log;exit();
             file_put_contents($this->path.'/'.$date.'.log',$log,FILE_APPEND|LOCK_EX);
         }
     }
+
+    /**
+     * 记录log
+     */
     public function log($data,$type='')
     {
         if($this->type==2)
@@ -56,30 +83,58 @@ class log
             \SeasLog::log($type, $data);
         }
     }
+
+    /**
+     * debug日志
+     */
     public function debug($data)
     {
         $this->_action($data,__FUNCTION__);
     }
+
+    /**
+     * info日志
+     */
     public function info($data)
     {
         $this->_action($data,__FUNCTION__);
     }
+
+    /**
+     * notice日志
+     */
     public function notice($data)
     {
         $this->_action($data,__FUNCTION__);
     }
+
+    /**
+     * error日志
+     */
     public function error($data)
     {
         $this->_action($data,__FUNCTION__);
     }
+
+    /**
+     * critical日志
+     */
     public function critical($data)
     {
         $this->_action($data,__FUNCTION__);
     }
+
+    /**
+     * alert日志
+     */
     public function alert($data)
     {
         $this->_action($data,__FUNCTION__);
     }
+
+    /**
+     * emergency日志
+     */
     public function emergency($data)
     {
         $this->_action($data,__FUNCTION__);
@@ -94,7 +149,7 @@ class log
         {
             \SeasLog::setBasePath($path);
         }else{
-            $this->path = $path;
+            $this->pathRoot = $path;
         }
     }
 
@@ -113,7 +168,7 @@ class log
         {
             \SeasLog::setLogger($name);
         }else{
-            $this->path = $this->path."/".$name."/";
+            $this->path = $this->pathRoot."/".$name."/";
             //要判断一下mkdir吧
             if (!is_dir($this->path)){
                 $this->dir_make($this->path);
