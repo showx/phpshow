@@ -273,6 +273,7 @@ Class show{
             if( method_exists ( $ctl, $this->ac ) === true )
             {
                 $newctl = new $ctl;
+                // todo $args判断类型实现依赖注入
                 call_user_func_array(array($newctl, $this->ac), $this->args );
                 //没发送，这里发送一下
                 if(!empty($connection))

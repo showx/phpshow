@@ -33,11 +33,15 @@ class response
      */
     public static function Header($data = '')
     {
-        if($data)
+        if(empty($data))
         {
-            header($data);
+            $data = 'Content-Type: text/html; charset=utf-8';
+        }
+        if(self::$connection)
+        {
+            \Workerman\Protocols\Http::header($data);
         }else{
-            header('Content-Type: text/html; charset=utf-8');
+            header($data);
         }
     }
 
@@ -71,7 +75,7 @@ class response
     public static function redirect($url="")
     {
         header('Location:'.$url);
-        exit();
+        return true;
     }
 
     /**
