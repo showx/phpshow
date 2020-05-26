@@ -31,7 +31,7 @@ class response
     /**
      * 输出头部信息
      */
-    public static function Header($data = '')
+    public static function Header($data)
     {
         if(empty($data))
         {
@@ -39,7 +39,15 @@ class response
         }
         if(self::$connection)
         {
-            \Workerman\Protocols\Http::header($data);
+            // 兼容workerman 3.x
+            if(method_exists("\Workerman\Protocols\Http","header"))
+            {
+                \Workerman\Protocols\Http::header($data);
+            }else{
+                // 4.x使用新方式 数组形式
+                self::$connection->send(new \Workerman\Protocols\Http\Response(302, $data));
+            }
+            
         }else{
             header($data);
         }
@@ -71,10 +79,25 @@ class response
     /**
      * url跳转
      * @param string $url
+     * $location = "http://www.baidu.com";
+     * \phpshow\response::redirect($location);
      */
     public static function redirect($url="")
     {
-        header('Location:'.$url);
+        if(self::$connection)
+        {
+            // 兼容workerman 3.x
+            if(method_exists("\Workerman\Protocols\Http","header"))
+            {
+                \Workerman\Protocols\Http::header("Location:".$url);
+            }else{
+                // 4.x使用新方式 数组形式
+                self::$connection->send(new \Workerman\Protocols\Http\Response(302, ['Location' => $url]));
+            }
+            
+        }else{
+            header('Location:'.$url);
+        }
         return true;
     }
 
@@ -91,13 +114,13 @@ class response
     /**
      * 向客服端输出内容
      */
-    public static function send($result)
+    public static function send($result,$http_code=200)
     {
         // echo "send:".lr;
         // var_dump($result);
         if(self::$connection)
         {
-            self::$connection->send(new \Workerman\Protocols\Http\Response(200, self::$cors, $result));
+            self::$connection->send(new \Workerman\Protocols\Http\Response($http_code, self::$cors, $result));
         }else{
             echo $result;
         }
