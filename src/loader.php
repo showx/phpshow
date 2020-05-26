@@ -272,9 +272,29 @@ Class show{
             //强制运行在cli下的规则
             if( method_exists ( $ctl, $this->ac ) === true )
             {
+                //新建控制器
                 $newctl = new $ctl;
-                // todo $args判断类型实现依赖注入
-                call_user_func_array(array($newctl, $this->ac), $this->args );
+                // echo 'ct make'.lr;
+                $ctlRef = new \ReflectionClass($newctl);
+                $acRef = $ctlRef->getMethod($this->ac);
+                $acParams = $acRef->getParameters();
+                $argsParam = [];
+                if($acParams)
+                {
+                    foreach($acParams as $acParam)
+                    {
+                        $acParamClass = $acParam->getClass();
+                        if(!empty($acParamClass))
+                        {
+                            // 从容器里获取，没有即new 
+                            $paramClassName = $acParamClass->name;
+                            $argsParam[] = new $paramClassName;
+                        }else{
+                            $argsParam[] = array_shift($this->args);
+                        }
+                    }
+                }
+                call_user_func_array(array($newctl, $this->ac), $argsParam );
                 //没发送，这里发送一下
                 if(!empty($connection))
                 {
@@ -360,9 +380,9 @@ Class loader{
      * 设置集合
      * setCollection
      */
-    public static function setC($collection_name,$collection_obj)
+    public static function setC(string $collection_name,\Closure $collection_obj)
     {
-        self::$master->bind($collection_name,new $collection_obj());
+        self::$master->bind($collection_name,$collection_obj);
     }
 
     /**
@@ -390,16 +410,6 @@ Class loader{
     public static function set($key,$value)
     {
         self::$result[$key] = $value;
-    }
-
-    /**
-     * 获取本地配置
-     * @param string $key
-     * @return mixed
-     */
-    public static function getConfig($key='')
-    {
-        return \phpshow\lib\config::get($key);
     }
 
     /**
