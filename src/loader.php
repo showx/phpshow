@@ -200,8 +200,16 @@ Class show{
     /**
      * 运行程序
      */
-    public function run($connection = '', $request = '')
+    public function run($connection, $request)
     {
+        if(empty($connection))
+        {
+            $connection = null;
+        }
+        if(empty($request))
+        {
+            $request = null;
+        }
         static $request_count = 0;
         if($this->config['type'] == 1)
         {

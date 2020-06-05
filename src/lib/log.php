@@ -12,10 +12,10 @@ namespace phpshow\lib;
 
 class log
 {
-    //默认使用seaslog作为写入日志 [1 seaslong |2 file_put_contents]
+    //默认使用seaslog作为写入日志 [2 seaslog |1 file_put_contents]
     public $type = 2;
     //日志类型
-    public $log_type = array("debug"=>1,"info"=>2,"notice"=>3,"error"=>4,"critical"=>5,"emergency"=>6);
+    public $log_type = array("debug"=>1,"info"=>2,"notice"=>3,"error"=>4,"critical"=>5,"emergency"=>6,"alert"=>7);
     //日志起始地址
     private $pathRoot = '';
     //日志地址
