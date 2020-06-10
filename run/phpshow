@@ -1,9 +1,5 @@
 #!/usr/bin/env php
 <?php
-// echo "cli\n";
-$bin_path = realpath(getcwd());
-require $bin_path.'/../autoload.php';
-use \phpshow\loader;
 /**
  *  PHP 入口执行
  *  没有控制器的脚本
@@ -12,4 +8,32 @@ use \phpshow\loader;
  * Date: 2018/7/19
  * Time: 下午11:41
  */
-loader::start();
+
+// __DIR__
+$dirPath = realpath(getcwd());
+
+$dir = $dirPath.'/..';
+
+if (!file_exists($dir.'/autoload.php')) {
+    $dir = $dirPath.'/../vendor';
+}
+
+if (!file_exists($dir.'/autoload.php')) {
+    $dir = $dirPath.'/../../..';
+}
+
+if (!file_exists($dir.'/autoload.php')) {
+    echo 'Autoload not found.';
+    exit(1);
+}
+
+require $dir.'/autoload.php';
+/**
+ *  PHP 入口执行
+ *  没有控制器的脚本
+ * Created by PhpStorm.
+ * User: shengsheng
+ * Date: 2018/7/19
+ * Time: 下午11:41
+ */
+\phpshow\loader::start();
