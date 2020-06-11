@@ -66,14 +66,12 @@ Class show{
             //页面结束调用 , type为1的时候作用不大
             register_shutdown_function(array($this, 'end'));
         }
-        // $this->init();
     }
 
     public function init()
     {
         request::init();
     }
-
 
     /**
      * 程序初始化
@@ -200,7 +198,7 @@ Class show{
     /**
      * 运行程序
      */
-    public function run($connection, $request)
+    public function run($connection = null, $request = null)
     {
         if(empty($connection))
         {
@@ -221,10 +219,6 @@ Class show{
             // echo $request_count.lr;
             \phpshow\response::setConnection($connection);
             $localfile = PS_APP_PATH."/public".$request->path();
-            // echo 'run:'.lr;
-            // var_dump($request->header());
-            // var_dump($request->post());
-            // echo $localfile.lr;
             // start 判断是否静态资源
             if (is_file($localfile)) {
     
@@ -303,12 +297,6 @@ Class show{
                     }
                 }
                 call_user_func_array(array($newctl, $this->ac), $argsParam );
-                //没发送，这里发送一下
-                if(!empty($connection))
-                {
-                    // 没什么事不要另外再发送一下
-                    // $connection->send("");
-                }
                 return true;
             } else {
                 throw new \Exception('fucking control..');
@@ -334,11 +322,9 @@ Class show{
 
 //App加载类
 Class loader{
-
     public static $master;
     public static $result = array();
     
-
     /**
      * 开始运行框架
      */
@@ -410,6 +396,7 @@ Class loader{
     {
         return self::$result[$key];
     }
+
     /**
      * 临时存放的变量
      * @param $key

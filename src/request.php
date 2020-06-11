@@ -7,16 +7,20 @@ namespace phpshow;
 class request
 {
     //用户的cookie
-    public static $cookies = array();
+    public static $cookies = [];
 
     //把GET、POST的变量合并一块，相当于 _REQUEST
-    public static $forms = array();
+    public static $forms = [];
     
     //_GET 变量
-    public static $gets = array();
+    public static $gets = [];
 
     //_POST 变量
-    public static $posts = array();
+    public static $posts = [];
+
+    //真实数据，没有进行addslashes
+    public static $_GET1 = [];
+    public static $_POST1 = [];
 
     public static $header = [];
 
@@ -39,13 +43,15 @@ class request
     {
         //每次初始化应该清空一下$form
         //用户的cookie
-        self::$cookies = array();
+        self::$cookies = [];
         //把GET、POST的变量合并一块，相当于 _REQUEST
-        self::$forms = array();
+        self::$forms = [];
         //_GET 变量
-        self::$gets = array();
+        self::$gets = [];
         //_POST 变量
-        self::$posts = array();
+        self::$posts = [];
+        self::$_GET1 = [];
+        self::$_POST1 = [];
 
         self::$request = $request;
 
@@ -67,9 +73,9 @@ class request
             self::$request_mdthod = $request->method();
             if($request->method() == 'GET')
             {
-                $request_arr = $request->get();
+                self::$_GET1 = $request_arr = $request->get();
             }elseif($request->method() == 'POST'){
-                $request_arr = $request->post();
+                self::$_POST1 = $request_arr = $request->post();
             }
             $requestpath = $request->path();
             if($requestpath)
@@ -121,10 +127,10 @@ class request
             self::$request_mdthod = '';
             if( $_SERVER['REQUEST_METHOD'] == 'GET' ) {
                 self::$request_mdthod = 'GET';
-                $request_arr = $_GET;
+                self::$_GET1 = $request_arr = $_GET;
             } else {
                 self::$request_mdthod = $_SERVER['REQUEST_METHOD'];
-                $request_arr = $_REQUEST;
+                self::$_POST1 = $request_arr = $_REQUEST;
             }
             //POST里的变更覆盖$_REQUEST(即是表单名与cookie同名, 表单优先)
             if($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -157,9 +163,6 @@ class request
                  }
             }
         }
-        //默认ac和ct
-        // self::$forms['ct'] = isset(self::$forms['ct']) ? self::$forms['ct'] : 'index';
-        // self::$forms['ac'] = isset(self::$forms['ac']) ? self::$forms['ac'] : 'index';
         //处理cookie
         if( count($_COOKIE) > 0 )
         {
