@@ -10,7 +10,12 @@ date_default_timezone_set('Asia/Shanghai');
 error_reporting( E_ALL );
 
 define("PS_PATH",dirname(__FILE__));
-define("PS_CONFIG_PATH",PS_APP_PATH."/config/");
+if(file_exists(PS_APP_PATH."/config_dev/"))
+{
+    define("PS_CONFIG_PATH",PS_APP_PATH."/config_dev/");
+}else{
+    define("PS_CONFIG_PATH",PS_APP_PATH."/config/");
+}
 define("PS_RUNTIME",PS_APP_PATH."/runtime/");
 
 if( php_sapi_name() == 'cli' )
