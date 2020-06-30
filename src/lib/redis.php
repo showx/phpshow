@@ -18,21 +18,27 @@ class redis
     {
         if(self::$hand_ob == null)
         {
-            $redis = new \Redis();
-            //config文件夹读取 不连接会出现Redis server went away
-            $config = \phpshow\lib\config::get("db")['redis'];
-            $redis->connect($config['host'], $config['port']);
-            if(!empty($config['auth']))
-            {
-                $redis->auth($config['auth']);
-            }
-            if(isset($config['db']))
-            {
-                $redis->select($config['db']);
-            }
-            self::$hand_ob = $redis;
+            self::renew();
         }
     }
+
+    public static function renew()
+    {
+        $redis = new \Redis();
+        //config文件夹读取 不连接会出现Redis server went away
+        $config = \phpshow\lib\config::get("db")['redis'];
+        $redis->connect($config['host'], $config['port']);
+        if(!empty($config['auth']))
+        {
+            $redis->auth($config['auth']);
+        }
+        if(isset($config['db']))
+        {
+            $redis->select($config['db']);
+        }
+        self::$hand_ob = $redis;
+    }
+
     /**
      * 获取句柄
      */
