@@ -26,6 +26,10 @@ class redis
             {
                 $redis->auth($config['auth']);
             }
+            if(isset($config['db']))
+            {
+                $redis->select($config['db']);
+            }
             self::$hand_ob = $redis;
         }
     }
