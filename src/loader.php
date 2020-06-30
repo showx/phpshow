@@ -150,6 +150,10 @@ Class show{
         {
             $path = $_SERVER['PATH_INFO'];
         }
+        if(defined("show_ct"))
+        {
+            $path = show_ct."/".show_ac;
+        }
         if(empty($path))
         {
             global $argv;
@@ -308,11 +312,14 @@ Class show{
             }
         }catch(\Throwable $e)
         {
+            $errorstr = '';
+            $errorstr .= "error:".$e->getMessage()." ".$this->ct."|".$this->ac.lr;
+            $errorstr .= "error_file_line".$e->getLine().lr;
+            $errorstr .= "error_file:".$e->getFile().lr;
+            \phpshow\helper\facade\log::error($errorstr);
             if($this->config['dev'] == '1')
             {
-                echo "error:".$e->getMessage()." ".$this->ct."|".$this->ac.lr;
-                echo "error_file_line".$e->getLine().lr;
-                echo "error_file:".$e->getFile().lr;
+                echo $errorstr;
                 // lookdata($e);
             }
             // $connection->send("- -!!");
